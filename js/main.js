@@ -1,4 +1,6 @@
-console.log("Main was called");
-var game = new Phaser.Game(16*32, 600, Phaser.AUTO, document.getElementById('game'));
+var HEIGHT =  window.innerHeight;
+var WIDTH = window.innerWidth;
+
+var game = new Phaser.Game(WIDTH, HEIGHT, Phaser.AUTO, document.getElementById('game'));
 game.state.add('Game',Game);
 game.state.start('Game');
