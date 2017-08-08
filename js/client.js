@@ -19,10 +19,13 @@ Client.socket.on('remove',function(id){
     Game.removePlayer(id);
 });
 
+///SENDS CLICK TO INDIVIDUAL SOCKET SERVER
 Client.sendClick = function(x,y){
   Client.socket.emit('click',{x:x,y:y});
 };
 
+
+///RECEIVES MOVE FROM SOCKET SERVER, TELLS GAME TO DO ACTUAL MOVING
 Client.socket.on('move',function(data){
     Game.movePlayer(data.id,data.x,data.y);
 });

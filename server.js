@@ -34,6 +34,7 @@ io.on('connection',function(socket){
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
+        ///RECEIVES CLICK FROM CLIENT, SENDS MOVE TO CLIENT 
         socket.on('click',function(data){
             socket.player.x = data.x;
             socket.player.y = data.y;

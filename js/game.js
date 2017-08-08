@@ -1,3 +1,5 @@
+var HEIGHT =  window.innerHeight;
+var WIDTH = window.innerWidth;
 
 var Game = {};
 
@@ -12,6 +14,7 @@ Game.preload = function() {
 };
 
 Game.create = function(){
+    ///MAP CREATION
     Game.playerMap = {};
     var map = game.add.tilemap('map');
     map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
@@ -20,10 +23,12 @@ Game.create = function(){
         layer = map.createLayer(i);
     }
     layer.inputEnabled = true; // Allows clicking on the map
-    Client.askNewPlayer();
 
+    ///INPUT HANDLING
     layer.events.onInputUp.add(Game.getCoordinates, this);
 
+    ///CHECK FOR NEW PLAYERS
+    Client.askNewPlayer();
 };
 
 Game.getCoordinates = function(layer,pointer){
@@ -39,6 +44,7 @@ Game.removePlayer = function(id){
     delete Game.playerMap[id];
 };
 
+///RECEIVES MOVE FROM CLIENT
 Game.movePlayer = function(id,x,y){
     var player = Game.playerMap[id];
     var distance = Phaser.Math.distance(player.x,player.y,x,y);
