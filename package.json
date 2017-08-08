@@ -1,6 +1,6 @@
 
 {
-  "name": "basic-mmo-phaser",
+  "name": "Online Arena",
   "version": "1.0.0",
   "description": " Very basic multiplayer online game example made with Phaser, Node.js and Socket.io ",
   "main": "server.js",
@@ -19,12 +19,9 @@
     "Node.js",
     "socket.io"
   ],
-  "author": "Jerome Renaux",
+  "author": "Lucas & Gustavo Amaral",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Jerenaux/basic-mmo-phaser/issues"
-  },
-  "homepage": "https://github.com/Jerenaux/basic-mmo-phaser#readme",
+
   "dependencies": {
     "express": "^4.15.2",
     "socket.io": "^1.7.3"

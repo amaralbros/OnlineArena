@@ -16,7 +16,7 @@ app.get('/',function(req,res){
 });
 
 server.listen(8081,function(){ // Listens to port 8081
-    console.log('Listening on '+server.address().ip);
+    console.log('Listening on '+server.address().port);
 });
 
 
