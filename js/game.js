@@ -24,16 +24,45 @@ Game.create = function(){
     }
     layer.inputEnabled = true; // Allows clicking on the map
 
+
     ///INPUT HANDLING
-    layer.events.onInputUp.add(Game.getCoordinates, this);
+    cursors = game.input.keyboard.createCursorKeys();
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
 };
 
-Game.getCoordinates = function(layer,pointer){
-    Client.sendClick(pointer.worldX,pointer.worldY);
-};
+Game.update = function(){
+  if (cursors.left.isDown)
+  {
+    Client.socket.emit('requestMovement', {
+      x: -1,
+      y: 0
+    })
+  }
+  else if (cursors.right.isDown)
+  {
+    Client.socket.emit('requestMovement', {
+      x: 1,
+      y: 0
+    })
+  }
+
+  if (cursors.up.isDown)
+  {
+    Client.socket.emit('requestMovement', {
+      x: 0,
+      y: -1
+    })
+  }
+  else if (cursors.down.isDown)
+  {
+    Client.socket.emit('requestMovement', {
+      x: 0,
+      y: 1
+    })
+  }
+}
 
 Game.addNewPlayer = function(id,x,y){
     Game.playerMap[id] = game.add.sprite(x,y,'sprite');
@@ -44,12 +73,12 @@ Game.removePlayer = function(id){
     delete Game.playerMap[id];
 };
 
+
 ///RECEIVES MOVE FROM CLIENT
-Game.movePlayer = function(id,x,y){
+
+Game.movePlayer = function(id,data){
     var player = Game.playerMap[id];
-    var distance = Phaser.Math.distance(player.x,player.y,x,y);
-    var duration = distance*10;
     var tween = game.add.tween(player);
-    tween.to({x:x,y:y}, duration);
+    tween.to({x:data.x,y:data.y}, 1);
     tween.start();
-};
+}
