@@ -1,6 +1,6 @@
 
 {
-  "name": "Online Arena",
+  "name": "online-arena",
   "version": "1.0.0",
   "description": " Very basic multiplayer online game example made with Phaser, Node.js and Socket.io ",
   "main": "server.js",
