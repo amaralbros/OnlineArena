@@ -1,34 +1,25 @@
-
 {
-  "name": "online-arena",
+  "name": "onlinearena",
   "version": "1.0.0",
-  "description": " Very basic multiplayer online game example made with Phaser, Node.js and Socket.io ",
+  "description": "",
   "main": "server.js",
+  "dependencies": {
+    "express": "^4.15.4",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jerenaux/basic-mmo-phaser.git"
+    "url": "git+https://github.com/amaralbros/OnlineArena.git"
   },
-  "keywords": [
-    "Phaser",
-    "Multiplayer",
-    "game",
-    "Node.js",
-    "socket.io"
-  ],
-  "author": "Lucas & Gustavo Amaral",
-  "license": "MIT",
-
-  "dependencies": {
-    "express": "^4.15.2",
-    "socket.io": "^1.7.3"
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amaralbros/OnlineArena/issues"
   },
-  "engines": {
-    "node": "4.1.1",
-    "npm": "2.1.x"
-  }
-
-  }
+  "homepage": "https://github.com/amaralbros/OnlineArena#readme"
+}
