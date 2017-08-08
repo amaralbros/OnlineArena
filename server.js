@@ -40,6 +40,12 @@ io.on('connection',function(socket){
             io.emit('move',socket.player);
         });
 
+        socket.on('requestMovement', function(data){
+            socket.player.x += data.x;
+            socket.player.y += data.y;
+            io.emit('respondMovement',socket.player)
+        })
+
         socket.on('disconnect',function(){
             io.emit('remove',socket.player.id);
         });
