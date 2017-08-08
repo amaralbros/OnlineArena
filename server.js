@@ -34,12 +34,7 @@ io.on('connection',function(socket){
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
-        socket.on('click',function(data){
-            socket.player.x = data.x;
-            socket.player.y = data.y;
-            io.emit('move',socket.player);
-        });
-
+        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT 
         socket.on('requestMovement', function(data){
             socket.player.x += data.x;
             socket.player.y += data.y;
