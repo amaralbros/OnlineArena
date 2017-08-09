@@ -153,7 +153,5 @@ Game.correctPos = function(player){
       var playerToMove = Game.playerMap[player.id];
       Game.playerMap[player.id].x = player.x;
       Game.playerMap[player.id].y = player.y;
-    }
   }
-
-}
+};
