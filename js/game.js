@@ -33,6 +33,7 @@ Game.create = function(){
     Client.askNewPlayer();
 };
 
+
 function createMap(){
   var map = game.add.tilemap('map');
   map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
@@ -47,11 +48,12 @@ Game.update = function(){
   game.physics.arcade.collide(players, players);
   resetVelocity();
   move();
+  updateCurrentUserPos(Game.currentUser);
+
 };
 
 function resetVelocity(){
   Object.values(Game.playerMap).forEach((player)=>{
-    // console.log(player.body.velocity);
     if (Math.floor(player.body.velocity.x) > 0) {
       player.body.velocity.x -= 1;
     } else if (Math.floor(player.body.velocity.x) < 0) {
@@ -71,14 +73,14 @@ function move(){
     Client.socket.emit('requestMovement', {
       x: -50,
       y: 0
-    })
+    });
   }
   else if (cursors.right.isDown)
   {
     Client.socket.emit('requestMovement', {
       x: 50,
       y: 0
-    })
+    });
   }
 
   if (cursors.up.isDown)
@@ -86,15 +88,23 @@ function move(){
     Client.socket.emit('requestMovement', {
       x: 0,
       y: -50
-    })
+    });
   }
   else if (cursors.down.isDown)
   {
     Client.socket.emit('requestMovement', {
       x: 0,
       y: 50
-    })
+    });
   }
+}
+
+function updateCurrentUserPos(user){
+  if (user) {
+    var pos = Game.playerMap[user.id];
+    Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+  }
+
 }
 
 Game.addNewPlayer = function(id,x,y){
@@ -120,4 +130,14 @@ Game.movePlayer = function(id,data){
     var player = Game.playerMap[id];
     player.body.velocity.x = data.velocityX;
     player.body.velocity.y = data.velocityY;
+};
+
+Game.storeCurrentUser = function(player){
+  Game.currentUser = player;
+}
+
+Game.correctPos = function(player){
+  var playerToMove = Game.playerMap[player.id];
+  playerToMove.x = player.x;
+  playerToMove.y = player.y;
 }
