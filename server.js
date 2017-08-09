@@ -28,8 +28,8 @@ io.on('connection',function(socket){
     socket.on('newplayer',function(){
         socket.player = {
             id: server.lastPlayderID++,
-            x: randomInt(100,400),
-            y: randomInt(100,400),
+            x: randomInt(200,400),
+            y: randomInt(200,400),
             velocityX: 0,
             velocityY: 0
         };
@@ -38,10 +38,14 @@ io.on('connection',function(socket){
 
         ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT
         socket.on('requestMovement', function(data){
+          if (data.x !== 0) {
             socket.player.velocityX = data.x;
+          }
+          if (data.y !== 0) {
             socket.player.velocityY = data.y;
-            io.emit('respondMovement',socket.player)
-        })
+          }
+          io.emit('respondMovement',socket.player);
+        });
 
         socket.on('disconnect',function(){
             io.emit('remove',socket.player.id);

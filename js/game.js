@@ -44,7 +44,12 @@ function createMap(){
 }
 
 Game.update = function(){
-  game.physics.arcade.collide(players, players, ()=>{console.log("col")});
+  game.physics.arcade.collide(players, players);
+  resetVelocity();
+  move();
+};
+
+function resetVelocity(){
   Object.values(Game.playerMap).forEach((player)=>{
     // console.log(player.body.velocity);
     if (Math.floor(player.body.velocity.x) > 0) {
@@ -57,9 +62,10 @@ Game.update = function(){
     } else if (Math.floor(player.body.velocity.y) < 0) {
       player.body.velocity.y += 1;
     }
+  });
+}
 
-  })
-
+function move(){
   if (cursors.left.isDown)
   {
     Client.socket.emit('requestMovement', {
@@ -96,8 +102,9 @@ Game.addNewPlayer = function(id,x,y){
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.x = 100;
   player.body.maxVelocity.y = 100;
+  player.body.width = 25;
+  player.body.height = 38;
   players.add(player);
-  console.log(players);
 
   Game.playerMap[id] = player;
 };
@@ -113,7 +120,4 @@ Game.movePlayer = function(id,data){
     var player = Game.playerMap[id];
     player.body.velocity.x = data.velocityX;
     player.body.velocity.y = data.velocityY;
-    // var tween = game.add.tween(player);
-    // tween.to({x:data.x,y:data.y}, 1);
-    // tween.start();
 }
