@@ -2,6 +2,9 @@ var HEIGHT =  window.innerHeight;
 var WIDTH = window.innerWidth;
 
 var Game = {};
+var cursors;
+var players;
+
 
 Game.init = function(){
     game.stage.disableVisibilityChange = true;
@@ -16,13 +19,11 @@ Game.preload = function() {
 Game.create = function(){
     ///MAP CREATION
     Game.playerMap = {};
-    var map = game.add.tilemap('map');
-    map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
-    var layer;
-    for(var i = 0; i < map.layers.length; i++) {
-        layer = map.createLayer(i);
-    }
-    layer.inputEnabled = true; // Allows clicking on the map
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    createMap();
+    players = game.add.group();
+    players.enableBody = true;
+    players.physicsBodyType = Phaser.Physics.ARCADE
 
 
     ///INPUT HANDLING
@@ -32,18 +33,44 @@ Game.create = function(){
     Client.askNewPlayer();
 };
 
+function createMap(){
+  var map = game.add.tilemap('map');
+  map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
+  var layer;
+  for(var i = 0; i < map.layers.length; i++) {
+      layer = map.createLayer(i);
+  }
+  layer.inputEnabled = true; // Allows clicking on the map
+}
+
 Game.update = function(){
+  game.physics.arcade.collide(players, players, ()=>{console.log("col")});
+  Object.values(Game.playerMap).forEach((player)=>{
+    // console.log(player.body.velocity);
+    if (Math.floor(player.body.velocity.x) > 0) {
+      player.body.velocity.x -= 1;
+    } else if (Math.floor(player.body.velocity.x) < 0) {
+      player.body.velocity.x += 1;
+    }
+    if (Math.floor(player.body.velocity.y) > 0) {
+      player.body.velocity.y -= 1;
+    } else if (Math.floor(player.body.velocity.y) < 0) {
+      player.body.velocity.y += 1;
+    }
+
+  })
+
   if (cursors.left.isDown)
   {
     Client.socket.emit('requestMovement', {
-      x: -1,
+      x: -50,
       y: 0
     })
   }
   else if (cursors.right.isDown)
   {
     Client.socket.emit('requestMovement', {
-      x: 1,
+      x: 50,
       y: 0
     })
   }
@@ -52,20 +79,27 @@ Game.update = function(){
   {
     Client.socket.emit('requestMovement', {
       x: 0,
-      y: -1
+      y: -50
     })
   }
   else if (cursors.down.isDown)
   {
     Client.socket.emit('requestMovement', {
       x: 0,
-      y: 1
+      y: 50
     })
   }
 }
 
 Game.addNewPlayer = function(id,x,y){
-    Game.playerMap[id] = game.add.sprite(x,y,'sprite');
+  var player = game.add.sprite(x,y,'sprite');
+  game.physics.enable(player, Phaser.Physics.ARCADE);
+  player.body.maxVelocity.x = 100;
+  player.body.maxVelocity.y = 100;
+  players.add(player);
+  console.log(players);
+
+  Game.playerMap[id] = player;
 };
 
 Game.removePlayer = function(id){
@@ -75,10 +109,11 @@ Game.removePlayer = function(id){
 
 
 ///RECEIVES MOVE FROM CLIENT
-
 Game.movePlayer = function(id,data){
     var player = Game.playerMap[id];
-    var tween = game.add.tween(player);
-    tween.to({x:data.x,y:data.y}, 1);
-    tween.start();
+    player.body.velocity.x = data.velocityX;
+    player.body.velocity.y = data.velocityY;
+    // var tween = game.add.tween(player);
+    // tween.to({x:data.x,y:data.y}, 1);
+    // tween.start();
 }

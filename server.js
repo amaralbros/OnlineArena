@@ -29,15 +29,17 @@ io.on('connection',function(socket){
         socket.player = {
             id: server.lastPlayderID++,
             x: randomInt(100,400),
-            y: randomInt(100,400)
+            y: randomInt(100,400),
+            velocityX: 0,
+            velocityY: 0
         };
         socket.emit('allplayers',getAllPlayers());
         socket.broadcast.emit('newplayer',socket.player);
 
-        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT 
+        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT
         socket.on('requestMovement', function(data){
-            socket.player.x += data.x;
-            socket.player.y += data.y;
+            socket.player.velocityX = data.x;
+            socket.player.velocityY = data.y;
             io.emit('respondMovement',socket.player)
         })
 
