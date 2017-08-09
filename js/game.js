@@ -47,7 +47,7 @@ function createMap(){
 Game.update = function(){
   game.physics.arcade.collide(players, players);
   resetVelocity();
-  move();
+  if (Game.currentUser){move()};
   updateCurrentUserPos(Game.currentUser);
 
 };
@@ -68,34 +68,44 @@ function resetVelocity(){
 }
 
 function move(){
+
+  // let directionVector = [0,0]
+  var player = Game.playerMap[Game.currentUser.id];
   if (cursors.left.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: -50,
-      y: 0
-    });
+    // Client.socket.emit('requestMovement', {
+    //   x: -50,
+    //   y: 0
+    // });
+    player.body.velocity.x = -50;
   }
   else if (cursors.right.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 50,
-      y: 0
-    });
+    // Client.socket.emit('requestMovement', {
+    //   x: 50,
+    //   y: 0
+    // });
+    player.body.velocity.x = 50;
+
   }
 
   if (cursors.up.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 0,
-      y: -50
-    });
+    // Client.socket.emit('requestMovement', {
+    //   x: 0,
+    //   y: -50
+    // });
+    player.body.velocity.y = -50;
+
   }
   else if (cursors.down.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 0,
-      y: 50
-    });
+    // Client.socket.emit('requestMovement', {
+    //   x: 0,
+    //   y: 50
+    // });
+    player.body.velocity.y = 50;
+
   }
 }
 
@@ -126,18 +136,22 @@ Game.removePlayer = function(id){
 
 
 ///RECEIVES MOVE FROM CLIENT
-Game.movePlayer = function(id,data){
-    var player = Game.playerMap[id];
-    player.body.velocity.x = data.velocityX;
-    player.body.velocity.y = data.velocityY;
-};
+// Game.movePlayer = function(id,data){
+//     var player = Game.playerMap[id];
+//     player.body.velocity.x = data.velocityX;
+//     player.body.velocity.y = data.velocityY;
+// };
 
 Game.storeCurrentUser = function(player){
   Game.currentUser = player;
+  console.log("currentUser", Game.currentUser);
 }
 
 Game.correctPos = function(player){
-  var playerToMove = Game.playerMap[player.id];
-  playerToMove.x = player.x;
-  playerToMove.y = player.y;
+  if (player && Game.playerMap) {
+    var playerToMove = Game.playerMap[player.id];
+    Game.playerMap[player.id].x = player.x;
+    Game.playerMap[player.id].y = player.y;
+  }
+
 }
