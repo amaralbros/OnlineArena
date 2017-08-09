@@ -29,3 +29,13 @@ Client.sendClick = function(x,y){
 Client.socket.on('respondMovement',function(data){
   Game.movePlayer(data.id,data);
 });
+
+//RECEIVES SELF CURRENT USER
+Client.socket.on('currentUser', (player)=>{
+  console.log(player);
+  Game.storeCurrentUser(player);
+})
+
+Client.socket.on('updateOnePos', (player)=>{
+  Game.correctPos(player);
+})
