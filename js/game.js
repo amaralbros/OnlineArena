@@ -148,7 +148,7 @@ Game.storeCurrentUser = function(player){
 }
 
 Game.correctPos = function(player){
-  if (player && Game.playerMap) {
+  if (player && Game.playerMap[player.id]) {
     var playerToMove = Game.playerMap[player.id];
     Game.playerMap[player.id].x = player.x;
     Game.playerMap[player.id].y = player.y;
