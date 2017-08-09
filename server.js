@@ -27,7 +27,7 @@ io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
         socket.player = {
-            id: server.lastPlayderID++,
+            id: randomInt(0,9999999999999999999),
             x: randomInt(100,400),
             y: randomInt(100,400),
             velocityX: 0,
