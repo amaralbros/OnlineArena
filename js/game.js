@@ -26,6 +26,7 @@ class Game {
     this.lastPos = {x:0, y:0}
   }
 
+
   createMap(){
     let map = game.add.tilemap('map');
     map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
@@ -43,7 +44,7 @@ class Game {
     this.keys.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     this.keys.s = game.input.keyboard.addKey(Phaser.Keyboard.S);
     this.keys.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
-    
+
     this.cursors = game.input.keyboard.createCursorKeys();
   }
 
