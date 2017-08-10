@@ -19,8 +19,8 @@ class Game {
     this.players.physicsBodyType = Phaser.Physics.ARCADE;
 
     ///INPUT HANDLING
-    this.cursors = game.input.keyboard.createCursorKeys();
-
+    this.createKeys()
+    
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
     this.lastPos = {x:0, y:0}
@@ -35,6 +35,16 @@ class Game {
       layer = map.createLayer(i);
     }
     layer.inputEnabled = true; // Allows clicking on the map
+  }
+
+  createKeys(){
+    this.keys = {}
+    this.keys.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    this.keys.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
+    this.keys.s = game.input.keyboard.addKey(Phaser.Keyboard.S);
+    this.keys.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    
+    this.cursors = game.input.keyboard.createCursorKeys();
   }
 
   update(){
@@ -71,19 +81,19 @@ class Game {
 
   move(){
     let player = this.playerMap[this.currentUser.id];
-    if (this.cursors.left.isDown)
+    if (this.cursors.left.isDown || this.keys.a.isDown)
     {
       player.body.velocity.x = -50;
     }
-    else if (this.cursors.right.isDown)
+    else if (this.cursors.right.isDown || this.keys.d.isDown)
     {
       player.body.velocity.x = 50;
     }
-    if (this.cursors.up.isDown)
+    if (this.cursors.up.isDown || this.keys.w.isDown)
     {
       player.body.velocity.y = -50;
     }
-    else if (this.cursors.down.isDown)
+    else if (this.cursors.down.isDown || this.keys.s.isDown)
     {
       player.body.velocity.y = 50;
     }
@@ -106,9 +116,9 @@ class Game {
     this.playerMap[this.currentUser.id].rotation = currentAngle;
 
     if (Math.floor(currentAngle * 10) !== Math.floor(this.lastOrientation * 10)) {
-        this.lastOrientation = currentAngle
-        Client.socket.emit("updateOrientation", currentAngle)
-      }
+      this.lastOrientation = currentAngle
+      Client.socket.emit("updateOrientation", currentAngle)
+    }
   }
 
   addNewPlayer(id,x,y){
