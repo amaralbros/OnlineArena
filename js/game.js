@@ -30,6 +30,9 @@ Game.create = function(){
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
+    if (Game.currentUser) {
+      Game.lastPos = {Game.currentUser.x, Game.currentUser.y}
+    }
 };
 
 
@@ -96,7 +99,7 @@ function move(){
 }
 
 function updateCurrentUserPos(user){
-  if (user) {
+  if (user && Game.lastPos !== Game.playerMap[user.id]) {
     var pos = Game.playerMap[user.id];
     Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
   }
