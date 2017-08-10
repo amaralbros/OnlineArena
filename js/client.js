@@ -27,6 +27,10 @@ class Client {
     this.socket.on('updateOnePos', (player)=>{
       Game.correctPos(player);
     })
+
+    this.socket.on('updateOneOrientation', (player)=>{
+      Game.correctOrientation(player);
+    })
   }
 
   askNewPlayer(){

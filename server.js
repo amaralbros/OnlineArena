@@ -20,9 +20,6 @@ server.listen(PORT,function(){
     console.log('Listening on '+server.address().port);
 });
 
-
-server.lastPlayderID = 0; // Keep track of the last id assigned to a new player
-
 io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
@@ -52,6 +49,12 @@ io.on('connection',function(socket){
         socket.on('updatePos', (pos)=>{
           let player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y)};
           socket.broadcast.emit('updateOnePos',player);
+        });
+
+        //UPDATE EVERYONES ORIENTATION
+        socket.on('updateOrientation', (angle)=>{
+          let player = {id: socket.player.id, angle: angle};
+          socket.broadcast.emit('updateOneOrientation',player);
         });
 
         //HANDLE LOGOUT

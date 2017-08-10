@@ -143,6 +143,12 @@ class Game {
       game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
     }
   }
+
+  correctOrientation(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      this.playerMap[player.id].rotation = player.angle
+    }
+  }
 }
 
 Game = new Game
