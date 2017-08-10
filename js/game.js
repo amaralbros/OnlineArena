@@ -1,163 +1,154 @@
-var HEIGHT =  window.innerHeight;
-var WIDTH = window.innerWidth;
+class Game {
+  init(){
+    this.stage.disableVisibilityChange = true;
+  }
 
-var Game = {};
-var cursors;
-var players;
+  preload(){
+    this.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
+    this.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
+    this.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
+  }
 
-
-Game.init = function(){
-  game.stage.disableVisibilityChange = true;
-};
-
-Game.preload = function() {
-  game.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
-  game.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
-    game.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
-  };
-
-  Game.create = function(){
+  create(){
+    this.playerMap = {};
     ///MAP CREATION
-    Game.playerMap = {};
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    createMap();
-    players = game.add.group();
-    players.enableBody = true;
-    players.physicsBodyType = Phaser.Physics.ARCADE;
+    this.createMap();
+    this.players = game.add.group();
+    this.players.enableBody = true;
+    this.players.physicsBodyType = Phaser.Physics.ARCADE;
 
     ///INPUT HANDLING
-    cursors = game.input.keyboard.createCursorKeys();
+    this.cursors = game.input.keyboard.createCursorKeys();
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
-    Game.lastPos = {x:0, y:0}
-  };
-
-
-  function createMap(){
-    var map = game.add.tilemap('map');
-  map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
-  var layer;
-  for(var i = 0; i < map.layers.length; i++) {
-    layer = map.createLayer(i);
-  }
-  layer.inputEnabled = true; // Allows clicking on the map
-}
-
-Game.update = function(){
-  game.physics.arcade.collide(players, players);
-  resetVelocity();
-  if (Game.currentUser){
-    move();
-    updateCurrentUserPos(Game.currentUser);
-    Game.playerMap[Game.currentUser.id].rotation = game.physics.arcade.angleToPointer(Game.playerMap[Game.currentUser.id]) - 1.5;
+    this.lastPos = {x:0, y:0}
   }
 
-};
+  createMap(){
+    let map = game.add.tilemap('map');
+    map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
+    let layer;
 
-function resetVelocity(){
-  Object.values(Game.playerMap).forEach((player)=>{
-
-    if (Math.floor(player.body.velocity.x) > 0) {
-      player.body.velocity.x -= 1;
-      player.animations.play('walk')
-    } else if (Math.floor(player.body.velocity.x) < 0) {
-      player.body.velocity.x += 1;
-      player.animations.play('walk')
+    for(let i = 0; i < map.layers.length; i++) {
+      layer = map.createLayer(i);
     }
-    if (Math.floor(player.body.velocity.y) > 0) {
-      player.body.velocity.y -= 1;
-      player.animations.play('walk')
-
-    } else if (Math.floor(player.body.velocity.y) < 0) {
-      player.body.velocity.y += 1;
-      player.animations.play('walk')
-
-    }
-    if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 ){
-      player.animations.play('stand')
-    }
-  });
-}
-
-function move(){
-  var player = Game.playerMap[Game.currentUser.id];
-  if (cursors.left.isDown)
-  {
-    player.body.velocity.x = -50;
-  }
-  else if (cursors.right.isDown)
-  {
-    player.body.velocity.x = 50;
-
+    layer.inputEnabled = true; // Allows clicking on the map
   }
 
-  if (cursors.up.isDown)
-  {
-    player.body.velocity.y = -50;
-
-  }
-  else if (cursors.down.isDown)
-  {
-    // Client.socket.emit('requestMovement', {
-    //   x: 0,
-    //   y: 50
-    // });
-    player.body.velocity.y = 50;
-
-  }
-}
-
-function updateCurrentUserPos(user){
-  if (user && Game.playerMap[user.id]) {
-    let x = Game.playerMap[user.id].x
-    let y = Game.playerMap[user.id].y
-    if (Math.floor(x) !== Math.floor(Game.lastPos.x) || Math.floor(y) !== Math.floor(Game.lastPos.y)) {
-      var pos = Game.playerMap[user.id];
-      Game.lastPos = {x:pos.x, y:pos.y}
-      Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+  update(){
+    game.physics.arcade.collide(this.players, this.players);
+    if (this.currentUser){
+      this.resetVelocity();
+      this.move();
+      this.updateCurrentUserPos(this.currentUser);
+      this.updateOrientation();
     }
   }
 
-}
-
-Game.addNewPlayer = function(id,x,y){
-  var player = game.add.sprite(x,y,'sprite');
-
-  player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
-  player.animations.add('stand', [15], 4)
-  player.anchor.setTo(0.5, 0.5);
-
-  game.physics.enable(player, Phaser.Physics.ARCADE);
-  player.body.maxVelocity.x = 100;
-  player.body.maxVelocity.y = 100;
-  player.body.width = 25;
-  player.body.height = 38;
-  players.add(player);
-
-  Game.playerMap[id] = player;
-};
-
-Game.removePlayer = function(id){
-  Game.playerMap[id].destroy();
-  delete Game.playerMap[id];
-};
-
-
-///RECEIVES MOVE FROM CLIENT
-// Game.movePlayer = function(id,data){
-//     var player = Game.playerMap[id];
-//     player.body.velocity.x = data.velocityX;
-//     player.body.velocity.y = data.velocityY;
-// };
-
-Game.storeCurrentUser = function(player){
-  Game.currentUser = player;
-  console.log("currentUser", Game.currentUser);
-}
-
-Game.correctPos = function(player){
-  if (player && Game.playerMap && Game.playerMap[player.id]) {
-    game.physics.arcade.moveToXY(Game.playerMap[player.id], player.x, player.y, 100, 100);
+  resetVelocity(){
+    Object.values(this.playerMap).forEach((player)=>{
+      if (Math.floor(player.body.velocity.x) > 0) {
+        player.body.velocity.x -= 1;
+        player.animations.play('walk')
+      } else if (Math.floor(player.body.velocity.x) < 0) {
+        player.body.velocity.x += 1;
+        player.animations.play('walk')
+      }
+      if (Math.floor(player.body.velocity.y) > 0) {
+        player.body.velocity.y -= 1;
+        player.animations.play('walk')
+      } else if (Math.floor(player.body.velocity.y) < 0) {
+        player.body.velocity.y += 1;
+        player.animations.play('walk')
+      }
+      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 ){
+        player.animations.play('stand')
+      }
+    });
   }
-};
+
+  move(){
+    let player = this.playerMap[this.currentUser.id];
+    if (this.cursors.left.isDown)
+    {
+      player.body.velocity.x = -50;
+    }
+    else if (this.cursors.right.isDown)
+    {
+      player.body.velocity.x = 50;
+    }
+    if (this.cursors.up.isDown)
+    {
+      player.body.velocity.y = -50;
+    }
+    else if (this.cursors.down.isDown)
+    {
+      player.body.velocity.y = 50;
+    }
+  }
+
+  updateCurrentUserPos(user){
+    if (user && this.playerMap[user.id]) {
+      let x = this.playerMap[user.id].x
+      let y = this.playerMap[user.id].y
+      if (Math.floor(x) !== Math.floor(this.lastPos.x) || Math.floor(y) !== Math.floor(this.lastPos.y)) {
+        let pos = this.playerMap[user.id];
+        this.lastPos = {x:pos.x, y:pos.y}
+        Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+      }
+    }
+  }
+
+  updateOrientation(){
+    let currentAngle = game.physics.arcade.angleToPointer(this.playerMap[this.currentUser.id]) - 1.5;
+    this.playerMap[this.currentUser.id].rotation = currentAngle;
+
+    if (Math.floor(currentAngle * 10) !== Math.floor(this.lastOrientation * 10)) {
+        this.lastOrientation = currentAngle
+        Client.socket.emit("updateOrientation", currentAngle)
+      }
+  }
+
+  addNewPlayer(id,x,y){
+    let player = game.add.sprite(x,y,'sprite');
+
+    player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
+    player.animations.add('stand', [15], 4)
+    player.anchor.setTo(0.5, 0.5);
+
+    game.physics.enable(player, Phaser.Physics.ARCADE);
+    player.body.maxVelocity.x = 100;
+    player.body.maxVelocity.y = 100;
+    player.body.width = 25;
+    player.body.height = 38;
+    this.players.add(player);
+
+    this.playerMap[id] = player;
+  }
+
+  removePlayer(id){
+    this.playerMap[id].destroy();
+    delete this.playerMap[id];
+  }
+
+  storeCurrentUser(player){
+    this.currentUser = player;
+    console.log("currentUser", this.currentUser);
+  }
+
+  correctPos(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+    }
+  }
+
+  correctOrientation(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      this.playerMap[player.id].rotation = player.angle
+    }
+  }
+}
+
+Game = new Game
