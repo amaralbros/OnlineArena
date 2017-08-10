@@ -142,6 +142,5 @@ Game.storeCurrentUser = function(player){
 Game.correctPos = function(player){
   if (player && Game.playerMap && Game.playerMap[player.id]) {
     game.physics.arcade.moveToXY(Game.playerMap[player.id], player.x, player.y, 100, 100);
-    console.log(game.physics.arcade.distanceToXY(Game.playerMap[player.id], player.x, player.y))
   }
 };
