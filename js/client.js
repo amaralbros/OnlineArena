@@ -1,40 +1,42 @@
-var Client = {};
-Client.socket = io.connect();
-Client.askNewPlayer = function(){
-  Client.socket.emit('newplayer');
-};
+class Client {
+  constructor(){
+    this.socket = io.connect();
 
-Client.socket.on('newplayer',function(data){
-  Game.addNewPlayer(data.id,data.x,data.y);
-});
+    this.socket.on('newplayer',(data)=>{
+      Game.addNewPlayer(data.id,data.x,data.y);
+    });
 
-Client.socket.on('allplayers',function(data){
-  for(var i = 0; i < data.length; i++){
-    Game.addNewPlayer(data[i].id,data[i].x,data[i].y);
+    this.socket.on('allplayers',(data)=>{
+      for(var i = 0; i < data.length; i++){
+        Game.addNewPlayer(data[i].id,data[i].x,data[i].y);
+      }
+    });
+
+    this.socket.on('remove',(id)=>{
+      Game.removePlayer(id);
+    });
+
+    this.socket.on('respondMovement',(data)=>{
+      Game.movePlayer(data.id,data);
+    });
+
+    this.socket.on('currentUser', (player)=>{
+      Game.storeCurrentUser(player);
+    })
+
+    this.socket.on('updateOnePos', (player)=>{
+      Game.correctPos(player);
+    })
   }
-});
 
-Client.socket.on('remove',function(id){
-  Game.removePlayer(id);
-});
+  askNewPlayer(){
+    this.socket.emit('newplayer');
+  }
 
+  sendClick(x,y){
+    this.socket.emit('click',{x:x,y:y});
+  };
+}
 
-///SENDS CLICK TO INDIVIDUAL SOCKET SERVER
-Client.sendClick = function(x,y){
-  Client.socket.emit('click',{x:x,y:y});
-};
+Client = new Client
 
-
-///RECEIVES MOVE FROM SOCKET SERVER, TELLS GAME TO DO ACTUAL MOVING
-Client.socket.on('respondMovement',function(data){
-  Game.movePlayer(data.id,data);
-});
-
-//RECEIVES SELF CURRENT USER
-Client.socket.on('currentUser', (player)=>{
-  Game.storeCurrentUser(player);
-})
-
-Client.socket.on('updateOnePos', (player)=>{
-  Game.correctPos(player);
-})
