@@ -7,16 +7,16 @@ var players;
 
 
 Game.init = function(){
-    game.stage.disableVisibilityChange = true;
+  game.stage.disableVisibilityChange = true;
 };
 
 Game.preload = function() {
-    game.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
-    game.load.image('sprite','assets/sprites/sprite.png'); // this will be the sprite of the players
-};
+  game.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
+  game.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
+    game.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
+  };
 
-Game.create = function(){
+  Game.create = function(){
     ///MAP CREATION
     Game.playerMap = {};
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -31,15 +31,15 @@ Game.create = function(){
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
     Game.lastPos = {x:0, y:0}
-};
+  };
 
 
-function createMap(){
-  var map = game.add.tilemap('map');
+  function createMap(){
+    var map = game.add.tilemap('map');
   map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
   var layer;
   for(var i = 0; i < map.layers.length; i++) {
-      layer = map.createLayer(i);
+    layer = map.createLayer(i);
   }
   layer.inputEnabled = true; // Allows clicking on the map
 }
@@ -50,20 +50,32 @@ Game.update = function(){
   if (Game.currentUser){
     move();
     updateCurrentUserPos(Game.currentUser);
+    Game.playerMap[Game.currentUser.id].rotation = game.physics.arcade.angleToPointer(Game.playerMap[Game.currentUser.id]) - 1.5;
   }
+
 };
 
 function resetVelocity(){
   Object.values(Game.playerMap).forEach((player)=>{
+
     if (Math.floor(player.body.velocity.x) > 0) {
       player.body.velocity.x -= 1;
+      player.animations.play('walk')
     } else if (Math.floor(player.body.velocity.x) < 0) {
       player.body.velocity.x += 1;
+      player.animations.play('walk')
     }
     if (Math.floor(player.body.velocity.y) > 0) {
       player.body.velocity.y -= 1;
+      player.animations.play('walk')
+
     } else if (Math.floor(player.body.velocity.y) < 0) {
       player.body.velocity.y += 1;
+      player.animations.play('walk')
+
+    }
+    if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 ){
+      player.animations.play('stand')
     }
   });
 }
@@ -111,6 +123,11 @@ function updateCurrentUserPos(user){
 
 Game.addNewPlayer = function(id,x,y){
   var player = game.add.sprite(x,y,'sprite');
+
+  player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
+  player.animations.add('stand', [15], 4)
+  player.anchor.setTo(0.5, 0.5);
+
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.x = 100;
   player.body.maxVelocity.y = 100;
@@ -122,8 +139,8 @@ Game.addNewPlayer = function(id,x,y){
 };
 
 Game.removePlayer = function(id){
-    Game.playerMap[id].destroy();
-    delete Game.playerMap[id];
+  Game.playerMap[id].destroy();
+  delete Game.playerMap[id];
 };
 
 
