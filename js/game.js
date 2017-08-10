@@ -20,10 +20,11 @@ class Game {
 
     ///INPUT HANDLING
     this.createKeys()
-    
+
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
     this.lastPos = {x:0, y:0}
+    this.attacking = false;
   }
 
 
@@ -39,7 +40,7 @@ class Game {
   }
 
   createKeys(){
-    this.keys = {}
+    this.keys = {};
     this.keys.w = game.input.keyboard.addKey(Phaser.Keyboard.W);
     this.keys.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     this.keys.s = game.input.keyboard.addKey(Phaser.Keyboard.S);
@@ -53,7 +54,10 @@ class Game {
   update(){
     game.physics.arcade.collide(this.players, this.players);
     if (this.currentUser){
-      this.resetVelocity();
+      if (!this.attacking) {
+        this.resetVelocity();
+      }
+
       this.move();
       this.attack();
       this.updateCurrentUserPos(this.currentUser);
@@ -65,19 +69,19 @@ class Game {
     Object.values(this.playerMap).forEach((player)=>{
       if (Math.floor(player.body.velocity.x) > 0) {
         player.body.velocity.x -= 1;
-        player.animations.play('walk')
+        player.animations.play('walk');
       } else if (Math.floor(player.body.velocity.x) < 0) {
         player.body.velocity.x += 1;
-        player.animations.play('walk')
+        player.animations.play('walk');
       }
       if (Math.floor(player.body.velocity.y) > 0) {
         player.body.velocity.y -= 1;
-        player.animations.play('walk')
+        player.animations.play('walk');
       } else if (Math.floor(player.body.velocity.y) < 0) {
         player.body.velocity.y += 1;
-        player.animations.play('walk')
+        player.animations.play('walk');
       }
-      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 ){
+      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !this.attacking ){
         player.animations.play('stand')
       }
     });
@@ -104,11 +108,20 @@ class Game {
   }
 
   attack(){
+    let self = this;
     let player = this.playerMap[this.currentUser.id];
 
-    if ((this.keys.space.isDown || this.input.activePointer.isDown) && player.animations.currentAnim.name !== 'attack'){
-      player.animations.play('attack')
-    } 
+    if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.attacking){
+      this.attacking = true;
+      player.animations.play('attack');
+      console.log("attacked");
+      // ATTACK LOGIC
+      game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this)
+    }
+  }
+
+  stopAttack(){
+    this.attacking = false;
   }
 
   updateCurrentUserPos(user){
@@ -136,9 +149,9 @@ class Game {
   addNewPlayer(id,x,y){
     let player = game.add.sprite(x,y,'sprite');
 
-    player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
-    player.animations.add('stand', [15], 4)
-    player.animations.add('attack', [32,33,34], 8)
+    player.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
+    player.animations.add('stand', [15], 4);
+    player.animations.add('attack', [32,33,34], 8);
 
     player.anchor.setTo(0.5, 0.5);
 
@@ -148,7 +161,7 @@ class Game {
     player.body.width = 25;
     player.body.height = 38;
 
-    player.health = 100
+    player.health = 100;
 
     this.players.add(player);
 
@@ -173,9 +186,9 @@ class Game {
 
   correctOrientation(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
-      this.playerMap[player.id].rotation = player.angle
+      this.playerMap[player.id].rotation = player.angle;
     }
   }
 }
 
-Game = new Game
+Game = new Game;
