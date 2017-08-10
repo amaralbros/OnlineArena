@@ -23,8 +23,7 @@ Game.create = function(){
     createMap();
     players = game.add.group();
     players.enableBody = true;
-    players.physicsBodyType = Phaser.Physics.ARCADE
-
+    players.physicsBodyType = Phaser.Physics.ARCADE;
 
     ///INPUT HANDLING
     cursors = game.input.keyboard.createCursorKeys();
@@ -47,9 +46,10 @@ function createMap(){
 Game.update = function(){
   game.physics.arcade.collide(players, players);
   resetVelocity();
-  if (Game.currentUser){move()};
-  updateCurrentUserPos(Game.currentUser);
-
+  if (Game.currentUser){
+    move();
+    updateCurrentUserPos(Game.currentUser);
+  }
 };
 
 function resetVelocity(){
@@ -68,33 +68,19 @@ function resetVelocity(){
 }
 
 function move(){
-
-  // let directionVector = [0,0]
   var player = Game.playerMap[Game.currentUser.id];
   if (cursors.left.isDown)
   {
-    // Client.socket.emit('requestMovement', {
-    //   x: -50,
-    //   y: 0
-    // });
     player.body.velocity.x = -50;
   }
   else if (cursors.right.isDown)
   {
-    // Client.socket.emit('requestMovement', {
-    //   x: 50,
-    //   y: 0
-    // });
     player.body.velocity.x = 50;
 
   }
 
   if (cursors.up.isDown)
   {
-    // Client.socket.emit('requestMovement', {
-    //   x: 0,
-    //   y: -50
-    // });
     player.body.velocity.y = -50;
 
   }
@@ -148,7 +134,6 @@ Game.storeCurrentUser = function(player){
 }
 
 Game.correctPos = function(player){
-  debugger
   if (player && Game.playerMap && Game.playerMap[player.id]) {
       var playerToMove = Game.playerMap[player.id];
       Game.playerMap[player.id].x = player.x;

@@ -32,7 +32,6 @@ Client.socket.on('respondMovement',function(data){
 
 //RECEIVES SELF CURRENT USER
 Client.socket.on('currentUser', (player)=>{
-  console.log(player);
   Game.storeCurrentUser(player);
 })
 
