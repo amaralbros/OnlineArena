@@ -13,7 +13,7 @@ Game.init = function(){
 Game.preload = function() {
     game.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
     game.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
-    game.load.image('sprite','assets/sprites/sprite.png'); // this will be the sprite of the players
+    game.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
 };
 
 Game.create = function(){
@@ -55,15 +55,25 @@ Game.update = function(){
 
 function resetVelocity(){
   Object.values(Game.playerMap).forEach((player)=>{
+
     if (Math.floor(player.body.velocity.x) > 0) {
       player.body.velocity.x -= 1;
+      player.animations.play('walk')
     } else if (Math.floor(player.body.velocity.x) < 0) {
       player.body.velocity.x += 1;
+      player.animations.play('walk')
     }
     if (Math.floor(player.body.velocity.y) > 0) {
       player.body.velocity.y -= 1;
+      player.animations.play('walk')
+
     } else if (Math.floor(player.body.velocity.y) < 0) {
       player.body.velocity.y += 1;
+      player.animations.play('walk')
+
+    }
+    if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 ){
+      player.animations.play('stand')
     }
   });
 }
@@ -111,6 +121,10 @@ function updateCurrentUserPos(user){
 
 Game.addNewPlayer = function(id,x,y){
   var player = game.add.sprite(x,y,'sprite');
+
+  player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
+  player.animations.add('stand', [15], 4)
+
   game.physics.enable(player, Phaser.Physics.ARCADE);
   player.body.maxVelocity.x = 100;
   player.body.maxVelocity.y = 100;
