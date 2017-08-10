@@ -43,7 +43,7 @@ class Game {
       this.resetVelocity();
       this.move();
       this.updateCurrentUserPos(this.currentUser);
-      this.playerMap[this.currentUser.id].rotation = game.physics.arcade.angleToPointer(this.playerMap[this.currentUser.id]) - 1.5;
+      this.updateOrientation();
     }
   }
 
@@ -79,7 +79,6 @@ class Game {
     {
       player.body.velocity.x = 50;
     }
-
     if (this.cursors.up.isDown)
     {
       player.body.velocity.y = -50;
@@ -100,6 +99,16 @@ class Game {
         Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
       }
     }
+  }
+
+  updateOrientation(){
+    let currentAngle = game.physics.arcade.angleToPointer(this.playerMap[this.currentUser.id]) - 1.5;
+    this.playerMap[this.currentUser.id].rotation = currentAngle;
+
+    if (Math.floor(currentAngle * 10) !== Math.floor(this.lastOrientation * 10)) {
+        this.lastOrientation = currentAngle
+        Client.socket.emit("updateOrientation", currentAngle)
+      }
   }
 
   addNewPlayer(id,x,y){
@@ -132,6 +141,12 @@ class Game {
   correctPos(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
       game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+    }
+  }
+
+  correctOrientation(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      this.playerMap[player.id].rotation = player.angle
     }
   }
 }
