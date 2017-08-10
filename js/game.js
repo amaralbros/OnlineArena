@@ -44,6 +44,8 @@ class Game {
     this.keys.a = game.input.keyboard.addKey(Phaser.Keyboard.A);
     this.keys.s = game.input.keyboard.addKey(Phaser.Keyboard.S);
     this.keys.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    this.keys.space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
 
     this.cursors = game.input.keyboard.createCursorKeys();
   }
@@ -53,6 +55,7 @@ class Game {
     if (this.currentUser){
       this.resetVelocity();
       this.move();
+      this.attack();
       this.updateCurrentUserPos(this.currentUser);
       this.updateOrientation();
     }
@@ -100,6 +103,14 @@ class Game {
     }
   }
 
+  attack(){
+    let player = this.playerMap[this.currentUser.id];
+
+    if ((this.keys.space.isDown || this.input.activePointer.isDown) && player.animations.currentAnim.name !== 'attack'){
+      player.animations.play('attack')
+    } 
+  }
+
   updateCurrentUserPos(user){
     if (user && this.playerMap[user.id]) {
       let x = this.playerMap[user.id].x
@@ -127,6 +138,8 @@ class Game {
 
     player.animations.add('walk', [16,17,18,20,21,22,23], 4, true)
     player.animations.add('stand', [15], 4)
+    player.animations.add('attack', [32,33,34], 8)
+
     player.anchor.setTo(0.5, 0.5);
 
     game.physics.enable(player, Phaser.Physics.ARCADE);
@@ -134,6 +147,9 @@ class Game {
     player.body.maxVelocity.y = 100;
     player.body.width = 25;
     player.body.height = 38;
+
+    player.health = 100
+
     this.players.add(player);
 
     this.playerMap[id] = player;
