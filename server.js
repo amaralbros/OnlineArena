@@ -1,7 +1,7 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io').listen(server);
+let express = require('express');
+let app = express();
+let server = require('http').Server(app);
+let io = require('socket.io').listen(server);
 const PORT = process.env.PORT || 3000;
 
 app.use('/css',express.static(__dirname + '/css'));
@@ -50,7 +50,7 @@ io.on('connection',function(socket){
 
         //UPDATE EVERYONES MOVEMENT
         socket.on('updatePos', (pos)=>{
-          var player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y)};
+          let player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y)};
           socket.broadcast.emit('updateOnePos',player);
         });
 
@@ -62,9 +62,9 @@ io.on('connection',function(socket){
 });
 
 function getAllPlayers(){
-    var players = [];
+    let players = [];
     Object.keys(io.sockets.connected).forEach(function(socketID){
-        var player = io.sockets.connected[socketID].player;
+        let player = io.sockets.connected[socketID].player;
         if(player) players.push(player);
     });
     return players;
