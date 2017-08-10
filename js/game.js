@@ -30,9 +30,7 @@ Game.create = function(){
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
-    if (Game.currentUser) {
-      Game.lastPos = {Game.currentUser.x, Game.currentUser.y}
-    }
+    Game.lastPos = {x:0, y:0}
 };
 
 
@@ -99,9 +97,14 @@ function move(){
 }
 
 function updateCurrentUserPos(user){
-  if (user && Game.lastPos !== Game.playerMap[user.id]) {
-    var pos = Game.playerMap[user.id];
-    Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+  if (user && Game.playerMap[user.id]) {
+    let x = Game.playerMap[user.id].x
+    let y = Game.playerMap[user.id].y
+    if (Math.floor(x) !== Math.floor(Game.lastPos.x) || Math.floor(y) !== Math.floor(Game.lastPos.y)) {
+      var pos = Game.playerMap[user.id];
+      Game.lastPos = {x:pos.x, y:pos.y}
+      Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+    }
   }
 
 }
@@ -139,6 +142,7 @@ Game.storeCurrentUser = function(player){
 Game.correctPos = function(player){
   if (player && Game.playerMap && Game.playerMap[player.id]) {
       var playerToMove = Game.playerMap[player.id];
+      console.log("playerToMove", playerToMove);
       Game.playerMap[player.id].x = player.x;
       Game.playerMap[player.id].y = player.y;
   }
