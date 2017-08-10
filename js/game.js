@@ -30,6 +30,7 @@ Game.create = function(){
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
+    Game.lastPos = {x:0, y:0}
 };
 
 
@@ -96,9 +97,14 @@ function move(){
 }
 
 function updateCurrentUserPos(user){
-  if (user) {
-    var pos = Game.playerMap[user.id];
-    Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+  if (user && Game.playerMap[user.id]) {
+    let x = Game.playerMap[user.id].x
+    let y = Game.playerMap[user.id].y
+    if (Math.floor(x) !== Math.floor(Game.lastPos.x) || Math.floor(y) !== Math.floor(Game.lastPos.y)) {
+      var pos = Game.playerMap[user.id];
+      Game.lastPos = {x:pos.x, y:pos.y}
+      Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+    }
   }
 
 }
