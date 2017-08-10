@@ -50,7 +50,7 @@ io.on('connection',function(socket){
 
         //UPDATE EVERYONES MOVEMENT
         socket.on('updatePos', (pos)=>{
-          var player = {id: socket.player.id, x: pos.x, y: pos.y};
+          var player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y)};
           socket.broadcast.emit('updateOnePos',player);
         });
 
