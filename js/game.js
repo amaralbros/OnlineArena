@@ -2,6 +2,9 @@ var HEIGHT =  window.innerHeight;
 var WIDTH = window.innerWidth;
 
 var Game = {};
+var cursors;
+var players;
+
 
 Game.init = function(){
     game.stage.disableVisibilityChange = true;
@@ -16,56 +19,106 @@ Game.preload = function() {
 Game.create = function(){
     ///MAP CREATION
     Game.playerMap = {};
-    var map = game.add.tilemap('map');
-    map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
-    var layer;
-    for(var i = 0; i < map.layers.length; i++) {
-        layer = map.createLayer(i);
-    }
-    layer.inputEnabled = true; // Allows clicking on the map
-
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    createMap();
+    players = game.add.group();
+    players.enableBody = true;
+    players.physicsBodyType = Phaser.Physics.ARCADE;
 
     ///INPUT HANDLING
     cursors = game.input.keyboard.createCursorKeys();
 
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
+    Game.lastPos = {x:0, y:0}
 };
 
+
+function createMap(){
+  var map = game.add.tilemap('map');
+  map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
+  var layer;
+  for(var i = 0; i < map.layers.length; i++) {
+      layer = map.createLayer(i);
+  }
+  layer.inputEnabled = true; // Allows clicking on the map
+}
+
 Game.update = function(){
+  game.physics.arcade.collide(players, players);
+  resetVelocity();
+  if (Game.currentUser){
+    move();
+    updateCurrentUserPos(Game.currentUser);
+  }
+};
+
+function resetVelocity(){
+  Object.values(Game.playerMap).forEach((player)=>{
+    if (Math.floor(player.body.velocity.x) > 0) {
+      player.body.velocity.x -= 1;
+    } else if (Math.floor(player.body.velocity.x) < 0) {
+      player.body.velocity.x += 1;
+    }
+    if (Math.floor(player.body.velocity.y) > 0) {
+      player.body.velocity.y -= 1;
+    } else if (Math.floor(player.body.velocity.y) < 0) {
+      player.body.velocity.y += 1;
+    }
+  });
+}
+
+function move(){
+  var player = Game.playerMap[Game.currentUser.id];
   if (cursors.left.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: -1,
-      y: 0
-    })
+    player.body.velocity.x = -50;
   }
   else if (cursors.right.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 1,
-      y: 0
-    })
+    player.body.velocity.x = 50;
+
   }
 
   if (cursors.up.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 0,
-      y: -1
-    })
+    player.body.velocity.y = -50;
+
   }
   else if (cursors.down.isDown)
   {
-    Client.socket.emit('requestMovement', {
-      x: 0,
-      y: 1
-    })
+    // Client.socket.emit('requestMovement', {
+    //   x: 0,
+    //   y: 50
+    // });
+    player.body.velocity.y = 50;
+
   }
 }
 
+function updateCurrentUserPos(user){
+  if (user && Game.playerMap[user.id]) {
+    let x = Game.playerMap[user.id].x
+    let y = Game.playerMap[user.id].y
+    if (Math.floor(x) !== Math.floor(Game.lastPos.x) || Math.floor(y) !== Math.floor(Game.lastPos.y)) {
+      var pos = Game.playerMap[user.id];
+      Game.lastPos = {x:pos.x, y:pos.y}
+      Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+    }
+  }
+
+}
+
 Game.addNewPlayer = function(id,x,y){
-    Game.playerMap[id] = game.add.sprite(x,y,'sprite');
+  var player = game.add.sprite(x,y,'sprite');
+  game.physics.enable(player, Phaser.Physics.ARCADE);
+  player.body.maxVelocity.x = 100;
+  player.body.maxVelocity.y = 100;
+  player.body.width = 25;
+  player.body.height = 38;
+  players.add(player);
+
+  Game.playerMap[id] = player;
 };
 
 Game.removePlayer = function(id){
@@ -75,10 +128,22 @@ Game.removePlayer = function(id){
 
 
 ///RECEIVES MOVE FROM CLIENT
+// Game.movePlayer = function(id,data){
+//     var player = Game.playerMap[id];
+//     player.body.velocity.x = data.velocityX;
+//     player.body.velocity.y = data.velocityY;
+// };
 
-Game.movePlayer = function(id,data){
-    var player = Game.playerMap[id];
-    var tween = game.add.tween(player);
-    tween.to({x:data.x,y:data.y}, 1);
-    tween.start();
+Game.storeCurrentUser = function(player){
+  Game.currentUser = player;
+  console.log("currentUser", Game.currentUser);
 }
+
+Game.correctPos = function(player){
+  if (player && Game.playerMap && Game.playerMap[player.id]) {
+      var playerToMove = Game.playerMap[player.id];
+      console.log("playerToMove", playerToMove);
+      Game.playerMap[player.id].x = player.x;
+      Game.playerMap[player.id].y = player.y;
+  }
+};

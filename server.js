@@ -27,20 +27,34 @@ io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
         socket.player = {
-            id: server.lastPlayderID++,
+            id: randomInt(0,9999999999999999999),
             x: randomInt(100,400),
-            y: randomInt(100,400)
+            y: randomInt(100,400),
+            velocityX: 0,
+            velocityY: 0
         };
         socket.emit('allplayers',getAllPlayers());
+        socket.emit('currentUser', socket.player);
         socket.broadcast.emit('newplayer',socket.player);
 
-        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT 
+        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT
         socket.on('requestMovement', function(data){
-            socket.player.x += data.x;
-            socket.player.y += data.y;
-            io.emit('respondMovement',socket.player)
-        })
+          if (data.x !== 0) {
+            socket.player.velocityX = data.x;
+          }
+          if (data.y !== 0) {
+            socket.player.velocityY = data.y;
+          }
+          io.emit('respondMovement',socket.player);
+        });
 
+        //UPDATE EVERYONES MOVEMENT
+        socket.on('updatePos', (pos)=>{
+          var player = {id: socket.player.id, x: pos.x, y: pos.y};
+          socket.broadcast.emit('updateOnePos',player);
+        });
+
+        //HANDLE LOGOUT
         socket.on('disconnect',function(){
             io.emit('remove',socket.player.id);
         });
