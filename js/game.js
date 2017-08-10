@@ -54,6 +54,7 @@ class Game {
   update(){
     game.physics.arcade.collide(this.players, this.players);
     if (this.currentUser){
+
       if (!this.attacking) {
         this.resetVelocity();
       }
@@ -154,17 +155,23 @@ class Game {
     player.animations.add('attack', [32,33,34], 8);
 
     player.anchor.setTo(0.5, 0.5);
-
     game.physics.enable(player, Phaser.Physics.ARCADE);
     player.body.maxVelocity.x = 100;
     player.body.maxVelocity.y = 100;
-    player.body.width = 25;
-    player.body.height = 38;
+    player.body.width = 30;
+    player.body.height = 30;
+    player.body.collideWorldBounds = true;
+    player.body.bounce.setTo(1, 1);
+    player.health = 100; ////CHANGE
 
-    player.health = 100;
+    //Make hitboxes
+    setInterval(function () {
+    game.debug.body(player)
+    }, 10);
+
+
 
     this.players.add(player);
-
     this.playerMap[id] = player;
   }
 
