@@ -28,7 +28,14 @@ io.on('connection',function(socket){
             x: randomInt(100,400),
             y: randomInt(100,400),
             velocityX: 0,
-            velocityY: 0
+            velocityY: 0,
+            stats: {
+              health: 100,
+              attack: 10,
+              armor: 10,
+              speed: 5,
+              attackSpeed: 1
+            }
         };
         socket.emit('allplayers',getAllPlayers());
         socket.emit('currentUser', socket.player);
@@ -57,6 +64,16 @@ io.on('connection',function(socket){
           socket.broadcast.emit('updateOneOrientation',player);
         });
 
+        //HANDLE ATTACK LOGIC
+        socket.on('handleAttack', (colliderId)=>{
+          let player = socket.player;
+          let attacked = getPlayerFromId(colliderId)
+          //ATTACK FORMULA
+          attacked.stats.health -= player.stats.attack;
+
+          io.sockets.emit('updateOneHealth',attacked);
+        });
+
         //HANDLE LOGOUT
         socket.on('disconnect',function(){
             io.emit('remove',socket.player.id);
@@ -71,6 +88,16 @@ function getAllPlayers(){
         if(player) players.push(player);
     });
     return players;
+}
+
+function getPlayerFromId(id){
+  let result = null;
+  Object.keys(io.sockets.connected).forEach(function(socketID){
+      if (io.sockets.connected[socketID].player.id === id) {
+        result = io.sockets.connected[socketID].player;
+      }
+  });
+  return result;
 }
 
 function randomInt (low, high) {
