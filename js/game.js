@@ -1,6 +1,7 @@
 class Player {
   constructor(id,x,y){
     this.sprite = game.add.sprite(x,y,'sprite');
+    this.sprite.id = id;
 
     this.sprite.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
     this.sprite.animations.add('stand', [15], 4);
@@ -14,7 +15,7 @@ class Player {
     this.sprite.body.height = 30;
     this.sprite.body.collideWorldBounds = true;
     this.sprite.body.bounce.setTo(1, 1);
-    this.sprite.health = 100; 
+    this.sprite.health = 100;
   }
 }
 
@@ -68,7 +69,6 @@ class Game {
     this.keys.d = game.input.keyboard.addKey(Phaser.Keyboard.D);
     this.keys.space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-
     this.cursors = game.input.keyboard.createCursorKeys();
   }
 
@@ -119,26 +119,20 @@ class Game {
   }
 
   handleAttack(owner, collider){
-    // console.log(owner, collider);
-    // console.log(this.currentSprite.attacking)
-    let damaged = false
-    if (this.currentSprite.attacking && !damaged){
-        console.log('hit')
-        damaged = true
-      game.time.events.add(Phaser.Timer.HALF, function() {
-        damaged = false
-      })
-
+    if (this.currentSprite.attacking && !collider.damaged){
+        console.log('hit');
+        collider.damaged = true;
+        game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=> collider.damaged = false);
+        Client.socket.emit("handleAttack", collider.id)
     }
   }
-  attack(){ 
+  attack(){
     let self = this;
 
     if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.currentSprite.attacking){
       this.currentSprite.attacking = true;
       this.currentSprite.animations.play('attack');
-      // ATTACK LOGIC
-      game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this)
+      game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this);
     }
 
   }
@@ -166,7 +160,6 @@ class Game {
       player.body.velocity.y = 50;
     }
   }
-
 
   updateCurrentUserPos(user){
     if (user && this.playerMap[user.id]) {
@@ -196,8 +189,6 @@ class Game {
     this.players.add(player.sprite);
     this.playerMap[id] = player.sprite;
   }
-
-
 
   removePlayer(id){
     this.playerMap[id].destroy();

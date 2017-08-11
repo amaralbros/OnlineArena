@@ -30,7 +30,11 @@ class Client {
 
     this.socket.on('updateOneOrientation', (player)=>{
       Game.correctOrientation(player);
-    })
+    });
+
+    // this.socket.on('handleAttack', (player)=>{
+    //   Game.correctOrientation(player);
+    // });
   }
 
   askNewPlayer(){
@@ -43,4 +47,3 @@ class Client {
 }
 
 Client = new Client
-
