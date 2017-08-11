@@ -15,6 +15,9 @@ class Game {
     game.physics.startSystem(Phaser.Physics.ARCADE);
     this.createMap();
     this.players = game.add.group();
+    // player.body.onCollide = new Phaser.Signal();
+    // player.body.onCollide.add(this.handleAttack, this);
+
     this.players.enableBody = true;
     this.players.physicsBodyType = Phaser.Physics.ARCADE;
 
@@ -54,6 +57,7 @@ class Game {
   update(){
     game.physics.arcade.collide(this.players, this.players);
     if (this.currentUser){
+      // game.physics.arcade.overlap(this.players - this.playerMap[this.currentUser.id], this.playerMap[this.currentUser.id], this.processAttack)
 
       if (!this.attacking) {
         this.resetVelocity();
@@ -63,6 +67,8 @@ class Game {
       this.attack();
       this.updateCurrentUserPos(this.currentUser);
       this.updateOrientation();
+      // console.log(Phaser.Math.radToDeg(this.playerMap[this.currentUser.id].rotation));
+
     }
   }
 
@@ -86,6 +92,13 @@ class Game {
         player.animations.play('stand')
       }
     });
+  }
+
+  handleAttack(owner, collider){
+    console.log("hey");
+    console.log(owner, collider);
+    // e.body.health.damage(100)
+    // console.log("attack");
   }
 
   move(){
@@ -115,7 +128,6 @@ class Game {
     if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.attacking){
       this.attacking = true;
       player.animations.play('attack');
-      console.log("attacked");
       // ATTACK LOGIC
       game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this)
     }
@@ -164,16 +176,51 @@ class Game {
     player.body.bounce.setTo(1, 1);
     player.health = 100; ////CHANGE
 
-    //Make hitboxes
-    setInterval(function () {
-    game.debug.body(player)
-    }, 10);
+    console.log(player.body)
 
+    // Make hitboxeshit
+    // console.log(player.getBounds());
+    // let hitbox = game.add.sprite(x,y,'sprite');
 
+    // setInterval(function () {
+    //   game.debug.body(hitbox)
+    // }, 10);
+    // let pgroup = game.add.group(player);
+    // let hitboxes = game.add.group();
+    // let pgroup = game.add.group();
+    // pgroup.add(player)
+    // hitboxes.enableBody = true;
+    // pgroup.addChild(hitboxes);
+
+    // // add some properties to the hitbox. These can be accessed later for use in calculations
+    // let self = this;
+    // setInterval(function () {
+    //   let x = -10*Math.sin(player.rotation);
+    //   let y = 10*Math.cos(player.rotation);
+    //   console.log(x,y);
+    //   self.hitbox1 = game.add.sprite(player.x,player.y,null);
+    //
+    //   self.hitbox1.enableBody = true;
+    //   console.log(self.hitbox1);
+    //   pgroup.addChild(self.hitbox1);
+    //   // pgroup.create(0,0,null);
+    //   // self.hitbox1 = hitboxes.create(0,0,null);
+    //
+    //   // self.hitbox1 = hitboxes.create(player.x,player.y,null);
+    //   // self.hitbox1.body.offset.setTo(x-15,y-15);
+    //   self.hitbox1.body.setSize(10 , 10, x, y);
+    //   self.hitbox1.body.moves = false;
+    //   game.debug.body(self.hitbox1);
+    //
+    //   // self.hitbox1.lifespan(1000)
+    //
+    // }, 1000);
 
     this.players.add(player);
     this.playerMap[id] = player;
   }
+
+
 
   removePlayer(id){
     this.playerMap[id].destroy();
