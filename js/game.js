@@ -1,3 +1,24 @@
+class Player {
+  constructor(id,x,y){
+    this.sprite = game.add.sprite(x,y,'sprite');
+
+    this.sprite.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
+    this.sprite.animations.add('stand', [15], 4);
+    this.sprite.animations.add('attack', [32,33,34], 8);
+
+    this.sprite.anchor.setTo(0.5, 0.5);
+    game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.maxVelocity.x = 100;
+    this.sprite.body.maxVelocity.y = 100;
+    this.sprite.body.width = 30;
+    this.sprite.body.height = 30;
+    this.sprite.body.collideWorldBounds = true;
+    this.sprite.body.bounce.setTo(1, 1);
+    this.sprite.health = 100; 
+  }
+}
+
+
 class Game {
   init(){
     this.stage.disableVisibilityChange = true;
@@ -15,8 +36,6 @@ class Game {
     game.physics.startSystem(Phaser.Physics.ARCADE);
     this.createMap();
     this.players = game.add.group();
-    // player.body.onCollide = new Phaser.Signal();
-    // player.body.onCollide.add(this.handleAttack, this);
 
     this.players.enableBody = true;
     this.players.physicsBodyType = Phaser.Physics.ARCADE;
@@ -27,7 +46,6 @@ class Game {
     ///CHECK FOR NEW PLAYERS
     Client.askNewPlayer();
     this.lastPos = {x:0, y:0}
-    this.attacking = false;
   }
 
 
@@ -55,21 +73,27 @@ class Game {
   }
 
   update(){
-    game.physics.arcade.collide(this.players, this.players);
     if (this.currentUser){
-      // game.physics.arcade.overlap(this.players - this.playerMap[this.currentUser.id], this.playerMap[this.currentUser.id], this.processAttack)
+      game.physics.arcade.collide(this.currentSprite, this.players, this.handleAttack, null, this);
 
-      if (!this.attacking) {
+      if (!this.currentSprite.attacking) {
         this.resetVelocity();
       }
-
+      this.checkIfAlive();
       this.move();
       this.attack();
       this.updateCurrentUserPos(this.currentUser);
       this.updateOrientation();
-      // console.log(Phaser.Math.radToDeg(this.playerMap[this.currentUser.id].rotation));
-
     }
+  }
+
+
+  checkIfAlive(){
+    Object.values(this.playerMap).forEach((player)=>{
+      if (player.health <= 0){
+        player.kill()
+      }
+    })
   }
 
   resetVelocity(){
@@ -88,21 +112,43 @@ class Game {
         player.body.velocity.y += 1;
         player.animations.play('walk');
       }
-      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !this.attacking ){
+      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !this.currentSprite.attacking ){
         player.animations.play('stand')
       }
     });
   }
 
   handleAttack(owner, collider){
-    console.log("hey");
-    console.log(owner, collider);
-    // e.body.health.damage(100)
-    // console.log("attack");
+    // console.log(owner, collider);
+    // console.log(this.currentSprite.attacking)
+    let damaged = false
+    if (this.currentSprite.attacking && !damaged){
+        console.log('hit')
+        damaged = true
+      game.time.events.add(Phaser.Timer.HALF, function() {
+        damaged = false
+      })
+
+    }
+  }
+  attack(){ 
+    let self = this;
+
+    if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.currentSprite.attacking){
+      this.currentSprite.attacking = true;
+      this.currentSprite.animations.play('attack');
+      // ATTACK LOGIC
+      game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this)
+    }
+
+  }
+
+  stopAttack(){
+    this.currentSprite.attacking = false;
   }
 
   move(){
-    let player = this.playerMap[this.currentUser.id];
+    let player = this.currentSprite;
     if (this.cursors.left.isDown || this.keys.a.isDown)
     {
       player.body.velocity.x = -50;
@@ -121,21 +167,6 @@ class Game {
     }
   }
 
-  attack(){
-    let self = this;
-    let player = this.playerMap[this.currentUser.id];
-
-    if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.attacking){
-      this.attacking = true;
-      player.animations.play('attack');
-      // ATTACK LOGIC
-      game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this)
-    }
-  }
-
-  stopAttack(){
-    this.attacking = false;
-  }
 
   updateCurrentUserPos(user){
     if (user && this.playerMap[user.id]) {
@@ -150,8 +181,8 @@ class Game {
   }
 
   updateOrientation(){
-    let currentAngle = game.physics.arcade.angleToPointer(this.playerMap[this.currentUser.id]) - 1.5;
-    this.playerMap[this.currentUser.id].rotation = currentAngle;
+    let currentAngle = game.physics.arcade.angleToPointer(this.currentSprite) - 1.5;
+    this.currentSprite.rotation = currentAngle;
 
     if (Math.floor(currentAngle * 10) !== Math.floor(this.lastOrientation * 10)) {
       this.lastOrientation = currentAngle
@@ -160,64 +191,10 @@ class Game {
   }
 
   addNewPlayer(id,x,y){
-    let player = game.add.sprite(x,y,'sprite');
+    let player = new Player(id,x,y)
 
-    player.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
-    player.animations.add('stand', [15], 4);
-    player.animations.add('attack', [32,33,34], 8);
-
-    player.anchor.setTo(0.5, 0.5);
-    game.physics.enable(player, Phaser.Physics.ARCADE);
-    player.body.maxVelocity.x = 100;
-    player.body.maxVelocity.y = 100;
-    player.body.width = 30;
-    player.body.height = 30;
-    player.body.collideWorldBounds = true;
-    player.body.bounce.setTo(1, 1);
-    player.health = 100; ////CHANGE
-
-    console.log(player.body)
-
-    // Make hitboxeshit
-    // console.log(player.getBounds());
-    // let hitbox = game.add.sprite(x,y,'sprite');
-
-    // setInterval(function () {
-    //   game.debug.body(hitbox)
-    // }, 10);
-    // let pgroup = game.add.group(player);
-    // let hitboxes = game.add.group();
-    // let pgroup = game.add.group();
-    // pgroup.add(player)
-    // hitboxes.enableBody = true;
-    // pgroup.addChild(hitboxes);
-
-    // // add some properties to the hitbox. These can be accessed later for use in calculations
-    // let self = this;
-    // setInterval(function () {
-    //   let x = -10*Math.sin(player.rotation);
-    //   let y = 10*Math.cos(player.rotation);
-    //   console.log(x,y);
-    //   self.hitbox1 = game.add.sprite(player.x,player.y,null);
-    //
-    //   self.hitbox1.enableBody = true;
-    //   console.log(self.hitbox1);
-    //   pgroup.addChild(self.hitbox1);
-    //   // pgroup.create(0,0,null);
-    //   // self.hitbox1 = hitboxes.create(0,0,null);
-    //
-    //   // self.hitbox1 = hitboxes.create(player.x,player.y,null);
-    //   // self.hitbox1.body.offset.setTo(x-15,y-15);
-    //   self.hitbox1.body.setSize(10 , 10, x, y);
-    //   self.hitbox1.body.moves = false;
-    //   game.debug.body(self.hitbox1);
-    //
-    //   // self.hitbox1.lifespan(1000)
-    //
-    // }, 1000);
-
-    this.players.add(player);
-    this.playerMap[id] = player;
+    this.players.add(player.sprite);
+    this.playerMap[id] = player.sprite;
   }
 
 
@@ -229,7 +206,9 @@ class Game {
 
   storeCurrentUser(player){
     this.currentUser = player;
-    console.log("currentUser", this.currentUser);
+    this.currentSprite = this.playerMap[player.id];
+
+    console.log("currentSprite", this.currentSprite);
   }
 
   correctPos(player){
