@@ -68,11 +68,10 @@ io.on('connection',function(socket){
         socket.on('handleAttack', (colliderId)=>{
           let player = socket.player;
           let attacked = getPlayerFromId(colliderId)
-          console.log("before",attacked);
           //ATTACK FORMULA
           attacked.stats.health -= player.stats.attack;
-          console.log("after",attacked);
-          // socket.broadcast.emit('updateOneOrientation',player);
+
+          io.sockets.emit('updateOneHealth',attacked);
         });
 
         //HANDLE LOGOUT

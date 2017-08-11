@@ -208,6 +208,18 @@ class Game {
     }
   }
 
+  correctHealth(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      let sprite = this.playerMap[player.id];
+      sprite.health = player.stats.health;
+
+      if (sprite.health <= 0) {
+        sprite.kill();
+      }
+    }
+  }
+
+
   correctOrientation(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
       this.playerMap[player.id].rotation = player.angle;
