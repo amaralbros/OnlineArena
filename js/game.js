@@ -6,8 +6,8 @@ class Player {
     this.sprite.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
     this.sprite.animations.add('stand', [15], 4);
     this.sprite.animations.add('attack', [32,33,34], 8);
-
     this.sprite.anchor.setTo(0.5, 0.5);
+
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     this.sprite.body.maxVelocity.x = 100;
     this.sprite.body.maxVelocity.y = 100;
@@ -16,6 +16,7 @@ class Player {
     this.sprite.body.collideWorldBounds = true;
     this.sprite.body.bounce.setTo(1, 1);
     this.sprite.health = 100;
+    this.sprite.attacking = false;
   }
 }
 
@@ -112,18 +113,20 @@ class Game {
         player.body.velocity.y += 1;
         player.animations.play('walk');
       }
-      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !this.currentSprite.attacking ){
+      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !player.attacking ){
         player.animations.play('stand')
+      }
+      if (player.attacking) {
+        player.animations.play('attack')
       }
     });
   }
 
   handleAttack(owner, collider){
     if (this.currentSprite.attacking && !collider.damaged){
-        console.log('hit');
         collider.damaged = true;
         game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=> collider.damaged = false);
-        Client.socket.emit("handleAttack", collider.id)
+        Client.socket.emit("handleAttack", collider.id);
     }
   }
   attack(){
@@ -131,11 +134,14 @@ class Game {
 
     if ((this.keys.space.isDown || this.input.activePointer.isDown) && !this.currentSprite.attacking){
       this.currentSprite.attacking = true;
-      this.currentSprite.animations.play('attack');
+      this.currentSprite.animations.play('attack',4,true);
       game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this);
+      Client.socket.emit("showAttack")
     }
 
   }
+
+
 
   stopAttack(){
     this.currentSprite.attacking = false;
@@ -219,10 +225,19 @@ class Game {
     }
   }
 
-
   correctOrientation(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
       this.playerMap[player.id].rotation = player.angle;
+    }
+  }
+
+  correctAttackAnimation(player){
+    if (player && this.playerMap && this.playerMap[player.id]) {
+      let sprite = this.playerMap[player.id]
+      sprite.attacking = true;
+    
+      console.log("this ran");
+      game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=>{sprite.attacking = false}, this);
     }
   }
 }

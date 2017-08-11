@@ -32,6 +32,10 @@ class Client {
       Game.correctOrientation(player);
     });
 
+    this.socket.on('updateOneAttackAnimation', (player)=>{
+      Game.correctAttackAnimation(player);
+    });
+
     this.socket.on('updateOneHealth', (player)=>{
       Game.correctHealth(player);
     });

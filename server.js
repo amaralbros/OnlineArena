@@ -64,6 +64,12 @@ io.on('connection',function(socket){
           socket.broadcast.emit('updateOneOrientation',player);
         });
 
+        //SHOW ATTACK TO EVERT CLIENT
+        socket.on('showAttack', ()=>{
+          let player = socket.player;
+          socket.broadcast.emit('updateOneAttackAnimation',player);
+        });
+
         //HANDLE ATTACK LOGIC
         socket.on('handleAttack', (colliderId)=>{
           let player = socket.player;
