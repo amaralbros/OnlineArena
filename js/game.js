@@ -27,8 +27,11 @@ class Game {
   }
 
   preload(){
-    this.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
-    this.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
+    // this.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
+    this.load.tilemap('map', 'assets/map/arenamap.json', null, Phaser.Tilemap.TILED_JSON);
+    this.load.image('tiles', 'assets/map/sprite_set.png',32,32);
+
+    // this.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
     this.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
   }
 
@@ -53,7 +56,7 @@ class Game {
 
   createMap(){
     let map = game.add.tilemap('map');
-    map.addTilesetImage('tilesheet', 'tileset'); // tilesheet is the key of the tileset in map's JSON file
+    map.addTilesetImage('arenamap', 'tiles'); // tilesheet is the key of the tileset in map's JSON file
     let layer;
 
     for(let i = 0; i < map.layers.length; i++) {
@@ -138,10 +141,7 @@ class Game {
       game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this);
       Client.socket.emit("showAttack")
     }
-
   }
-
-
 
   stopAttack(){
     this.currentSprite.attacking = false;
@@ -205,7 +205,6 @@ class Game {
     this.currentUser = player;
     this.currentSprite = this.playerMap[player.id];
 
-    console.log("currentSprite", this.currentSprite);
   }
 
   correctPos(player){
@@ -235,7 +234,7 @@ class Game {
     if (player && this.playerMap && this.playerMap[player.id]) {
       let sprite = this.playerMap[player.id]
       sprite.attacking = true;
-    
+
       console.log("this ran");
       game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=>{sprite.attacking = false}, this);
     }

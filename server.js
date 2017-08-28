@@ -73,7 +73,7 @@ io.on('connection',function(socket){
         //HANDLE ATTACK LOGIC
         socket.on('handleAttack', (colliderId)=>{
           let player = socket.player;
-          let attacked = getPlayerFromId(colliderId)
+          let attacked = getPlayerFromId(colliderId);
           //ATTACK FORMULA
           attacked.stats.health -= player.stats.attack;
 
