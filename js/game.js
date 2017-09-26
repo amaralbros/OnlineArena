@@ -27,11 +27,8 @@ class Game {
   }
 
   preload(){
-    // this.load.tilemap('map', 'assets/map/example_map.json', null, Phaser.Tilemap.TILED_JSON);
     this.load.tilemap('map', 'assets/map/arenamap.json', null, Phaser.Tilemap.TILED_JSON);
     this.load.image('tiles', 'assets/map/sprite_set.png',32,32);
-
-    // this.load.spritesheet('tileset', 'assets/map/tilesheet.png',32,32);
     this.load.spritesheet('sprite','assets/sprites/troll.png', 48, 48, 40); // this will be the sprite of the players
   }
 
@@ -53,16 +50,31 @@ class Game {
     this.lastPos = {x:0, y:0}
   }
 
-
   createMap(){
     let map = game.add.tilemap('map');
     map.addTilesetImage('arenamap', 'tiles'); // tilesheet is the key of the tileset in map's JSON file
     let layer;
 
-    for(let i = 0; i < map.layers.length; i++) {
-      layer = map.createLayer(i);
-    }
-    layer.inputEnabled = true; // Allows clicking on the map
+    //create base layer
+    let base = map.createLayer('Base');
+
+    //create the collision layer
+    let collisionLayer = map.createLayer('Collision');
+    this.collisionLayer = collisionLayer;
+    collisionLayer.visible = false;
+
+    // set collision
+    map.setCollisionByExclusion([], true, this.collisionLayer);
+    map.setCollision(347)
+
+    //  This resizes the game world to match the layer dimensions
+    collisionLayer.resizeWorld();
+
+    // creating the foreground layer last after all moving sprites
+    // ensures that this layer will stay above during depth sorting
+    map.createLayer('Foreground');
+
+    base.inputEnabled = true; // Allows clicking on the map
   }
 
   createKeys(){
@@ -78,6 +90,7 @@ class Game {
 
   update(){
     if (this.currentUser){
+      game.physics.arcade.collide(this.players, this.collisionLayer)
       game.physics.arcade.collide(this.currentSprite, this.players, this.handleAttack, null, this);
 
       if (!this.currentSprite.attacking) {

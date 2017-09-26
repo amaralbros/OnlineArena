@@ -1,7 +1,7 @@
 var HEIGHT =  window.innerHeight;
 var WIDTH = window.innerWidth;
 
-var game = new Phaser.Game(1280, 1280, Phaser.AUTO, document.getElementById('game'));
+var game = new Phaser.Game(640, 640, Phaser.AUTO, document.getElementById('game'));
 
 
 //LOAD STATES
