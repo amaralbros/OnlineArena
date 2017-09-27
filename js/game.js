@@ -217,7 +217,8 @@ class Game {
   }
 
   removePlayer(id){
-    this.playerMap[id].destroy();
+    this.playerMap[id].destroy()
+    this.playerMap[id].label.destroy();
     delete this.playerMap[id];
   }
 
