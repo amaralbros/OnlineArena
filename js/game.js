@@ -1,8 +1,15 @@
 class Player {
-  constructor(id,x,y){
+  constructor(id,x,y, username){
     this.sprite = game.add.sprite(x,y,'sprite');
     this.sprite.id = id;
+    this.username = username;
 
+    //Username Lable
+    var style = { font: "12px Helvetica", fill: "#ffffff" };
+    this.label_name = game.add.text(this.sprite.x-16, this.sprite.y-45, username, style);
+    this.sprite.label = this.label_name
+
+    //animations
     this.sprite.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
     this.sprite.animations.add('stand', [15], 4);
     this.sprite.animations.add('attack', [32,33,34], 8);
@@ -20,7 +27,6 @@ class Player {
   }
 }
 
-
 class Game {
   init(){
     this.stage.disableVisibilityChange = true;
@@ -33,12 +39,13 @@ class Game {
   }
 
   create(){
-    this.playerMap = {};
     ///MAP CREATION
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.playerMap = {};
+    this.physics.startSystem(Phaser.Physics.ARCADE);
     this.createMap();
-    this.players = game.add.group();
 
+    //Add player info
+    this.players = game.add.group();
     this.players.enableBody = true;
     this.players.physicsBodyType = Phaser.Physics.ARCADE;
 
@@ -46,7 +53,7 @@ class Game {
     this.createKeys()
 
     ///CHECK FOR NEW PLAYERS
-    Client.askNewPlayer();
+    Client.askNewPlayer(window.username);
     this.lastPos = {x:0, y:0}
   }
 
@@ -103,7 +110,6 @@ class Game {
       this.updateOrientation();
     }
   }
-
 
   checkIfAlive(){
     Object.values(this.playerMap).forEach((player)=>{
@@ -184,6 +190,8 @@ class Game {
     if (user && this.playerMap[user.id]) {
       let x = this.playerMap[user.id].x
       let y = this.playerMap[user.id].y
+      this.playerMap[user.id].label.x = x-16;
+      this.playerMap[user.id].label.y = y-45;
       if (Math.floor(x) !== Math.floor(this.lastPos.x) || Math.floor(y) !== Math.floor(this.lastPos.y)) {
         let pos = this.playerMap[user.id];
         this.lastPos = {x:pos.x, y:pos.y}
@@ -202,9 +210,8 @@ class Game {
     }
   }
 
-  addNewPlayer(id,x,y){
-    let player = new Player(id,x,y)
-
+  addNewPlayer(id,x,y, username){
+    let player = new Player(id,x,y, username)
     this.players.add(player.sprite);
     this.playerMap[id] = player.sprite;
   }
@@ -223,6 +230,8 @@ class Game {
   correctPos(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
       game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+      this.playerMap[player.id].label.x = player.x-16;
+      this.playerMap[player.id].label.y = player.y-45;
     }
   }
 
@@ -247,8 +256,6 @@ class Game {
     if (player && this.playerMap && this.playerMap[player.id]) {
       let sprite = this.playerMap[player.id]
       sprite.attacking = true;
-
-      console.log("this ran");
       game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=>{sprite.attacking = false}, this);
     }
   }

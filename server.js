@@ -22,9 +22,10 @@ server.listen(PORT,function(){
 
 io.on('connection',function(socket){
 
-    socket.on('newplayer',function(){
+    socket.on('newplayer',function(username){
         socket.player = {
             id: randomInt(0,9999999999999999999),
+            username: username,
             x: randomInt(100,400),
             y: randomInt(100,400),
             velocityX: 0,
@@ -54,7 +55,7 @@ io.on('connection',function(socket){
 
         //UPDATE EVERYONES MOVEMENT
         socket.on('updatePos', (pos)=>{
-          let player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y)};
+          let player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y), username: socket.player.username};
           socket.broadcast.emit('updateOnePos',player);
         });
 
