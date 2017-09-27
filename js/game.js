@@ -188,16 +188,20 @@ class Game {
 
   updateCurrentUserPos(user){
     if (user && this.playerMap[user.id]) {
-      let x = this.playerMap[user.id].x
-      let y = this.playerMap[user.id].y
-      this.playerMap[user.id].label.x = x-16;
-      this.playerMap[user.id].label.y = y-45;
+      let x = this.playerMap[user.id].x;
+      let y = this.playerMap[user.id].y;
+      this.updateLabelPos(this.playerMap[user.id]);
       if (Math.floor(x) !== Math.floor(this.lastPos.x) || Math.floor(y) !== Math.floor(this.lastPos.y)) {
         let pos = this.playerMap[user.id];
         this.lastPos = {x:pos.x, y:pos.y}
         Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
       }
     }
+  }
+
+  updateLabelPos(sprite) {
+    sprite.label.x = sprite.x-16;
+    sprite.label.y = sprite.y-45;
   }
 
   updateOrientation(){
@@ -231,8 +235,7 @@ class Game {
   correctPos(player){
     if (player && this.playerMap && this.playerMap[player.id]) {
       game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
-      this.playerMap[player.id].label.x = player.x-16;
-      this.playerMap[player.id].label.y = player.y-45;
+      this.updateLabelPos(this.playerMap[player.id]);
     }
   }
 
