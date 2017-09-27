@@ -195,10 +195,12 @@ class Game {
   }
 
   removePlayer(id){
-    this.playerMap[id].destroy()
-    this.playerMap[id].label.destroy();
-    this.playerMap[id].healthBar.destroy();
-    delete this.playerMap[id];
+    if (this.playerMap[id]) {
+      this.playerMap[id].label.destroy();
+      this.playerMap[id].healthBar.kill();
+      this.playerMap[id].kill()
+      delete this.playerMap[id];
+    }
   }
 
   storeCurrentUser(player){
