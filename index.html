@@ -9,8 +9,13 @@
 
   <body>
     <div id="login">
-      <input type="text" name="username" value="" placeholder="enter username...">
-      <button type="button" name="button">GO</button>
+      <div class="title-box">
+        <h1>WELCOME TO THE ONLINE ARENA</h1>
+      </div>
+      <div class="login-box">
+        <input type="text" name="username" value="" placeholder="enter username...">
+        <button type="button" name="button">GO</button>
+      </div>
     </div>
     <div id="game">
 
@@ -21,6 +26,7 @@
   <script src="js/game.js" charset="utf-8"></script>
   <script src="js/main.js" charset="utf-8"></script>
 </html>
+
 <style media="screen">
   body, html {
     height: 100%;
@@ -34,8 +40,23 @@
     margin: auto;
     padding: 100px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  #login .login-box {
+    flex: 1;
+    display: flex;
+    width: 100%;
+  }
+
+  #login .title-box {
+    flex: 1;
+  }
+  #login .title-box h1 {
+    color: white;
+    font-size: 40px;
+    text-align: center;
   }
   #login input {
     flex: 9;
@@ -52,5 +73,9 @@
     color: grey;
     padding: 2px;
     font-size: 35px;
+  }
+  #login h1 {
+    color: white;
+    flex:1;
   }
 </style>

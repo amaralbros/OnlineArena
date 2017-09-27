@@ -7,7 +7,7 @@ login.addEventListener("click", startGame);
 function startGame(e){
   e.preventDefault();
   let name = document.querySelector("input").value;
-  e.currentTarget.parentNode.remove();
+  e.currentTarget.parentNode.parentNode.remove();
   window.username = name;
   loadGame();
 }
