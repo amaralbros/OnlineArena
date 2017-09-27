@@ -1,32 +1,3 @@
-class Player {
-  constructor(id,x,y, username){
-    this.sprite = game.add.sprite(x,y,'sprite');
-    this.sprite.id = id;
-    this.username = username;
-
-    //Username Lable
-    var style = { font: "12px Helvetica", fill: "#ffffff" };
-    this.label_name = game.add.text(this.sprite.x-16, this.sprite.y-45, username, style);
-    this.sprite.label = this.label_name
-
-    //animations
-    this.sprite.animations.add('walk', [16,17,18,20,21,22,23], 4, true);
-    this.sprite.animations.add('stand', [15], 4);
-    this.sprite.animations.add('attack', [32,33,34], 8);
-    this.sprite.anchor.setTo(0.5, 0.5);
-
-    game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
-    this.sprite.body.maxVelocity.x = 100;
-    this.sprite.body.maxVelocity.y = 100;
-    this.sprite.body.width = 30;
-    this.sprite.body.height = 30;
-    this.sprite.body.collideWorldBounds = true;
-    this.sprite.body.bounce.setTo(1, 1);
-    this.sprite.health = 100;
-    this.sprite.attacking = false;
-  }
-}
-
 class Game {
   init(){
     this.stage.disableVisibilityChange = true;
@@ -193,15 +164,18 @@ class Game {
       this.updateLabelPos(this.playerMap[user.id]);
       if (Math.floor(x) !== Math.floor(this.lastPos.x) || Math.floor(y) !== Math.floor(this.lastPos.y)) {
         let pos = this.playerMap[user.id];
-        this.lastPos = {x:pos.x, y:pos.y}
-        Client.socket.emit("updatePos", {x: pos.x, y: pos.y})
+        this.lastPos = {x:pos.x, y:pos.y};
+        Client.socket.emit("updatePos", {x: pos.x, y: pos.y});
       }
     }
   }
 
   updateLabelPos(sprite) {
-    sprite.label.x = sprite.x-16;
-    sprite.label.y = sprite.y-45;
+    let x = sprite.x;
+    let y = sprite.y;
+    sprite.label.x = x-16;
+    sprite.label.y = y-45;
+    sprite.healthBar.setPosition(x-5, y-25);
   }
 
   updateOrientation(){
@@ -223,6 +197,7 @@ class Game {
   removePlayer(id){
     this.playerMap[id].destroy()
     this.playerMap[id].label.destroy();
+    this.playerMap[id].healthBar.destroy();
     delete this.playerMap[id];
   }
 
@@ -243,8 +218,12 @@ class Game {
     if (player && this.playerMap && this.playerMap[player.id]) {
       let sprite = this.playerMap[player.id];
       sprite.health = player.stats.health;
+      //change to current/total health
+      sprite.healthBar.setPercent((sprite.health/100)*100);
 
       if (sprite.health <= 0) {
+        sprite.healthBar.kill();
+        sprite.label.destroy();
         sprite.kill();
       }
     }
