@@ -197,6 +197,7 @@ class Game {
   removePlayer(id){
     this.playerMap[id].destroy()
     this.playerMap[id].label.destroy();
+    this.playerMap[id].healthBar.destroy();
     delete this.playerMap[id];
   }
 
@@ -217,8 +218,12 @@ class Game {
     if (player && this.playerMap && this.playerMap[player.id]) {
       let sprite = this.playerMap[player.id];
       sprite.health = player.stats.health;
+      //change to current/total health
+      sprite.healthBar.setPercent((sprite.health/100)*100);
 
       if (sprite.health <= 0) {
+        sprite.healthBar.kill();
+        sprite.label.destroy();
         sprite.kill();
       }
     }
