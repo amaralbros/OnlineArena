@@ -3,12 +3,12 @@ class Client {
     this.socket = io.connect();
 
     this.socket.on('newplayer',(data)=>{
-      Game.addNewPlayer(data.id,data.x,data.y);
+      Game.addNewPlayer(data.id,data.x,data.y, data.username);
     });
 
     this.socket.on('allplayers',(data)=>{
       for(var i = 0; i < data.length; i++){
-        Game.addNewPlayer(data[i].id,data[i].x,data[i].y);
+        Game.addNewPlayer(data[i].id,data[i].x,data[i].y, data[i].username);
       }
     });
 
@@ -41,8 +41,8 @@ class Client {
     });
   }
 
-  askNewPlayer(){
-    this.socket.emit('newplayer');
+  askNewPlayer(username){
+    this.socket.emit('newplayer', username);
   }
 
   sendClick(x,y){
