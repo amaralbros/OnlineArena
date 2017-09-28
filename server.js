@@ -12,10 +12,6 @@ app.get('/',function(req,res){
     res.sendFile(__dirname+'/index.html');
 });
 
-app.get('/',function(req,res){
-    res.sendFile(__dirname+'/index.html');
-});
-
 server.listen(PORT,function(){
     console.log('Listening on '+server.address().port);
 });
