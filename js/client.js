@@ -47,7 +47,7 @@ class Client {
 
   sendClick(x,y){
     this.socket.emit('click',{x:x,y:y});
-  };
+  }
 }
 
-Client = new Client
+Client = new Client;

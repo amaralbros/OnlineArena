@@ -5,17 +5,23 @@
     <title>Online Arena</title>
     <script src="js/phaser.min.js" charset="utf-8"></script>
     <script src="/socket.io/socket.io.js"></script>
-
+    <script src="https://use.fontawesome.com/f58ff23766.js"></script>
   </head>
 
   <body>
     <div id="login">
       <div class="title-box">
-        <h1>WELCOME TO THE ONLINE ARENA</h1>
+        <h1>ARE YOU THE</h1>
+        <h1><span class="emphasis">K</span>ING <span class="emphasis">O</span>F <span class="emphasis">T</span>HE <span class="emphasis">H</span>ILL?</h1>
       </div>
       <div class="login-box">
         <input type="text" name="username" value="" placeholder="enter username...">
-        <button type="button" name="button">GO</button>
+        <button type="button" name="button">ENTER</button>
+      </div>
+      <div class="instructions-box">
+        <h3><i class="fa fa-keyboard-o" aria-hidden="true"></i>
+ to move</h3>
+        <h3><i class="fa fa-mouse-pointer" aria-hidden="true"></i> to aim and attack</h3>
       </div>
     </div>
     <div id="game">
@@ -47,18 +53,27 @@
     align-items: center;
   }
   #login .login-box {
+    align-items: center;
     flex: 1;
     display: flex;
     width: 100%;
   }
 
   #login .title-box {
+    align-items: center;
     flex: 1;
   }
   #login .title-box h1 {
     color: white;
-    font-size: 40px;
+    font-size: 35px;
     text-align: center;
+  }
+
+  #login .instructions-box {
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    color: white;
   }
   #login input {
     flex: 9;
@@ -74,10 +89,16 @@
     background-color: white;
     color: grey;
     padding: 2px;
-    font-size: 35px;
+    font-size: 25px;
   }
   #login h1 {
     color: white;
     flex:1;
+  }
+  .emphasis {
+    font-size: 55px;
+  }
+  .white {
+    color: white;
   }
 </style>

@@ -21,7 +21,6 @@ server.listen(PORT,function(){
 });
 
 io.on('connection',function(socket){
-
     socket.on('newplayer',function(username){
         socket.player = {
             id: randomInt(0,9999999999999999999),
