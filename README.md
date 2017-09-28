@@ -22,9 +22,9 @@ All in real time, synchronized amongst clients.
 1. The first step in creating this project was to setup the server. Node/express were chosen to keep the project in Javascript, with a mounted Sockets server. Nodemon took care of automatically refreshing changes to the server, and it was all hosted on Heroku.
 
 2. The second step was the render something the user could see. Phaser.js uses roughly the following paradigm to render games:  
-⋅⋅1. An init/preload function to load all necessary resources.
-⋅⋅2. A create function to create all necessary objects, such as the map and player characters.
-⋅⋅3. An update function that runs every few frames to handle things like movement.
+ 1. An init/preload function to load all necessary resources.
+ 2. A create function to create all necessary objects, such as the map and player characters.
+ 3. An update function that runs every few frames to handle things like movement.
 
 The preload function took care of loading the map sheet (made using a third party software called Tiled) and the character sprite sheet. Now users were greeted with a nice little map when they entered the game!
 
@@ -77,8 +77,8 @@ io.on('connection',function(socket){
         socket.broadcast.emit('newplayer',socket.player);
 ```
 
-⋅⋅4. The socket layer sends an event to the correct user.
-⋅⋅5. Game logic picks up the event, and updates the browser for the user.
+ 4. The socket layer sends an event to the correct user.
+ 5. Game logic picks up the event, and updates the browser for the user.
 
 For login,
 
