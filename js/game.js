@@ -72,7 +72,7 @@ class Game {
       game.physics.arcade.collide(this.currentSprite, this.players, this.handleAttack, null, this);
 
       if (!this.currentSprite.attacking) {
-        this.resetVelocity();
+        this.handleVelocity();
       }
       this.checkIfAlive();
       this.move();
@@ -90,7 +90,7 @@ class Game {
     })
   }
 
-  resetVelocity(){
+  handleVelocity(){
     Object.values(this.playerMap).forEach((player)=>{
       if (Math.floor(player.body.velocity.x) > 0) {
         player.body.velocity.x -= 1;
@@ -106,7 +106,8 @@ class Game {
         player.body.velocity.y += 1;
         player.animations.play('walk');
       }
-      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0 && !player.attacking ){
+      if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0
+      && !player.attacking ){
         player.animations.play('stand')
       }
       if (player.attacking) {
@@ -162,7 +163,8 @@ class Game {
       let x = this.playerMap[user.id].x;
       let y = this.playerMap[user.id].y;
       this.updateLabelPos(this.playerMap[user.id]);
-      if (Math.floor(x) !== Math.floor(this.lastPos.x) || Math.floor(y) !== Math.floor(this.lastPos.y)) {
+      if (Math.floor(x) !== Math.floor(this.lastPos.x)
+      || Math.floor(y) !== Math.floor(this.lastPos.y)) {
         let pos = this.playerMap[user.id];
         this.lastPos = {x:pos.x, y:pos.y};
         Client.socket.emit("updatePos", {x: pos.x, y: pos.y});
@@ -206,7 +208,6 @@ class Game {
   storeCurrentUser(player){
     this.currentUser = player;
     this.currentSprite = this.playerMap[player.id];
-
   }
 
   correctPos(player){
