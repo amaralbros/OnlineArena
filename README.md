@@ -20,14 +20,13 @@ All in real time, synchronized amongst clients.
 ## Process
 
 ### Step 1: Server Setup
-The first step in creating this project was to setup the server. Node/express were chosen to keep the project in Javascript, with a mounted Sockets server. Nodemon took care of automatically refreshing changes to the server, and it was all hosted on Heroku.
-
+The first step in creating this project was to setup the server. Node/express/sockets.io were chosen to keep the project purely in Javascript. Nodemon took care of automatically refreshing changes to the server, and it was all hosted on Heroku.
 
 ### Step 2: Initial Loading
 The second step was the render something the user could see. Phaser.js uses roughly the following paradigm to render games:  
-  i. An init/preload function to load all necessary resources.
-  ii. A create function to create all necessary objects, such as the map and player characters.
-  iii. An update function that runs every few frames to handle things like movement.
+1. An init/preload function to load all necessary resources.
+2. A create function to create all necessary objects, such as the map and player characters.
+3. An update function that runs every few frames to handle things like movement.
 
 * The preload function took care of loading the map sheet (made using a third party software called Tiled) and the character sprite sheet. Now users were greeted with a nice little map when they entered the game!
 
@@ -193,4 +192,4 @@ Finally, attack handling is done by detecting collision between two sprites and 
 
 ### Step 5: Future Implementations
 
-This game is currently a work in progress. The next steps are to add authentication for login, and a database backend to keep track of player's stats, like level and attack power. For now, it sets the necessary infrastructure to add on to.
+This game is currently a work in progress. The next steps are to add authentication for login, and a database backend to keep track of player's stats, like level and attack power. For now, it sets the necessary infrastructure to add on to. 
