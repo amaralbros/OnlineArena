@@ -1,7 +1,8 @@
 # King of the Hill
-![Sample](assets/koth_sample.gif "Logo Title Text 1")
 
 King of the Hill (KOTH) is an online, synchronous multiplayer game. It is built purely with Javascript, using the Phaser.js library for HTML Canvas rendering on the frontend, a Node server with Express.js, and Sockets.io for client-server communications. The purpose of this project was to explore how multiplayer games work.
+
+![Sample](assets/koth_sample.gif "Logo Title Text 1")
 
 [Live Version](https://koth.herokuapp.com/ "Live Version")
 
