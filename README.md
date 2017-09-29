@@ -52,6 +52,7 @@ askNewPlayer(username){
 }
 ```
 This event lets the server know that a new player has connected, passing in his username.
+
 3. Server performs any necessary logic, and sends an event back to the socket layer.
 ```
 io.on('connection',function(socket){
@@ -192,4 +193,4 @@ Finally, attack handling is done by detecting collision between two sprites and 
 
 ### Step 5: Future Implementations
 
-This game is currently a work in progress. The next steps are to add authentication for login, and a database backend to keep track of player's stats, like level and attack power. For now, it sets the necessary infrastructure to add on to. 
+This game is currently a work in progress. The next steps are to add authentication for login, and a database backend to keep track of player's stats, like level and attack power. For now, it sets the necessary infrastructure to add on to.
