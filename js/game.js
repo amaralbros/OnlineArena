@@ -21,11 +21,11 @@ class Game {
     this.players.physicsBodyType = Phaser.Physics.ARCADE;
 
     ///INPUT HANDLING
-    this.createKeys()
+    this.createKeys();
 
     ///CHECK FOR NEW PLAYERS
-    Client.askNewPlayer(window.username);
-    this.lastPos = {x:0, y:0}
+    Client.askNewPlayer(window.username); //change for user id later
+    this.lastPos = {x:0, y:0};
   }
 
   createMap(){
@@ -43,7 +43,7 @@ class Game {
 
     // set collision
     map.setCollisionByExclusion([], true, this.collisionLayer);
-    map.setCollision(347)
+    map.setCollision(347);
 
     //  This resizes the game world to match the layer dimensions
     collisionLayer.resizeWorld();
@@ -120,7 +120,7 @@ class Game {
     if (this.currentSprite.attacking && !collider.damaged){
         collider.damaged = true;
         game.time.events.add(Phaser.Timer.SECOND * 0.5, ()=> collider.damaged = false);
-        Client.socket.emit("handleAttack", collider.id);
+        Client.socket.emit('handleAttackFromClient', collider.id);
     }
   }
   attack(){
@@ -130,7 +130,7 @@ class Game {
       this.currentSprite.attacking = true;
       this.currentSprite.animations.play('attack',4,true);
       game.time.events.add(Phaser.Timer.SECOND * 0.5, this.stopAttack, this);
-      Client.socket.emit("showAttack")
+      Client.socket.emit('updateAttackAnimationFromClient');
     }
   }
 
@@ -167,7 +167,7 @@ class Game {
       || Math.floor(y) !== Math.floor(this.lastPos.y)) {
         let pos = this.playerMap[user.id];
         this.lastPos = {x:pos.x, y:pos.y};
-        Client.socket.emit("updatePos", {x: pos.x, y: pos.y});
+        Client.socket.emit('updatePosFromClient', {x: pos.x, y: pos.y});
       }
     }
   }
@@ -186,7 +186,7 @@ class Game {
 
     if (Math.floor(currentAngle * 10) !== Math.floor(this.lastOrientation * 10)) {
       this.lastOrientation = currentAngle
-      Client.socket.emit("updateOrientation", currentAngle)
+      Client.socket.emit('updateOrientationFromClient', currentAngle)
     }
   }
 

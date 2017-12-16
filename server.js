@@ -16,6 +16,9 @@ server.listen(PORT,function(){
     console.log('Listening on '+server.address().port);
 });
 
+//Global object mapping player id's to their respective sockets
+let playerSocketMap = {};
+
 io.on('connection',function(socket){
     socket.on('newplayer',function(username){
         socket.player = {
@@ -23,8 +26,7 @@ io.on('connection',function(socket){
             username: username,
             x: randomInt(100,400),
             y: randomInt(100,400),
-            velocityX: 0,
-            velocityY: 0,
+            angle: 0,
             stats: {
               health: 100,
               attack: 10,
@@ -33,47 +35,38 @@ io.on('connection',function(socket){
               attackSpeed: 1
             }
         };
+        //Maps a socket to a player id
+        playerSocketMap[socket.player.id] = socket.player;
+
         socket.emit('allplayers',getAllPlayers());
         socket.emit('currentUser', socket.player);
         socket.broadcast.emit('newplayer',socket.player);
 
-        ///RECEIVES MOVE FROM CLIENT, SENDS MOVE TO CLIENT
-        socket.on('requestMovement', function(data){
-          if (data.x !== 0) {
-            socket.player.velocityX = data.x;
-          }
-          if (data.y !== 0) {
-            socket.player.velocityY = data.y;
-          }
-          io.emit('respondMovement',socket.player);
-        });
-
-        //UPDATE EVERYONES MOVEMENT
-        socket.on('updatePos', (pos)=>{
-          let player = {id: socket.player.id, x: Math.floor(pos.x), y:Math.floor(pos.y), username: socket.player.username};
-          socket.broadcast.emit('updateOnePos',player);
+        ///RECEIVES POSITION FROM CLIENT, UPDATES EVERYONE'S GAME TO REFLECT THAT
+        socket.on('updatePosFromClient', (pos)=>{
+          socket.player.x = Math.floor(pos.x);
+          socket.player.y = Math.floor(pos.y);
+          socket.broadcast.emit('updatePosFromServer',socket.player);
         });
 
         //UPDATE EVERYONES ORIENTATION
-        socket.on('updateOrientation', (angle)=>{
-          let player = {id: socket.player.id, angle: angle};
-          socket.broadcast.emit('updateOneOrientation',player);
+        socket.on('updateOrientationFromClient', (angle)=>{
+          socket.player.angle = angle;
+          socket.broadcast.emit('updateOrientationFromServer',socket.player);
         });
 
         //SHOW ATTACK TO EVERT CLIENT
-        socket.on('showAttack', ()=>{
-          let player = socket.player;
-          socket.broadcast.emit('updateOneAttackAnimation',player);
+        socket.on('updateAttackAnimationFromClient', ()=>{
+          socket.broadcast.emit('updateAttackAnimationFromServer',socket.player);
         });
 
         //HANDLE ATTACK LOGIC
-        socket.on('handleAttack', (colliderId)=>{
-          let player = socket.player;
-          let attacked = getPlayerFromId(colliderId);
+        socket.on('handleAttackFromClient', (colliderId)=>{
+          let attacked = playerSocketMap[String(colliderId)];
           //ATTACK FORMULA
-          attacked.stats.health -= player.stats.attack;
+          attacked.stats.health -= socket.player.stats.attack;
 
-          io.sockets.emit('updateOneHealth',attacked);
+          io.sockets.emit('updateHealthFromServer',attacked);
         });
 
         //HANDLE LOGOUT
@@ -90,16 +83,6 @@ function getAllPlayers(){
         if(player) players.push(player);
     });
     return players;
-}
-
-function getPlayerFromId(id){
-  let result = null;
-  Object.keys(io.sockets.connected).forEach(function(socketID){
-      if (io.sockets.connected[socketID].player.id === id) {
-        result = io.sockets.connected[socketID].player;
-      }
-  });
-  return result;
 }
 
 function randomInt (low, high) {

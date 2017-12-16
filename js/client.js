@@ -24,25 +24,25 @@ class Client {
       Game.storeCurrentUser(player);
     })
 
-    this.socket.on('updateOnePos', (player)=>{
+    this.socket.on('updatePosFromServer', (player)=>{
       Game.correctPos(player);
     })
 
-    this.socket.on('updateOneOrientation', (player)=>{
+    this.socket.on('updateOrientationFromServer', (player)=>{
       Game.correctOrientation(player);
     });
 
-    this.socket.on('updateOneAttackAnimation', (player)=>{
+    this.socket.on('updateAttackAnimationFromServer', (player)=>{
       Game.correctAttackAnimation(player);
     });
 
-    this.socket.on('updateOneHealth', (player)=>{
+    this.socket.on('updateHealthFromServer', (player)=>{
       Game.correctHealth(player);
     });
   }
 
   askNewPlayer(username){
-    this.socket.emit('newplayer', username);
+    this.socket.emit('newplayer', username); //pass id later
   }
 
   sendClick(x,y){
