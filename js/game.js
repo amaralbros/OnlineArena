@@ -92,6 +92,9 @@ class Game {
 
   handleVelocity(){
     Object.values(this.playerMap).forEach((player)=>{
+      // if (Math.floor(player.body.velocity.x) !== 0 || Math.floor(player.body.velocity.y) !== 0) {
+      //   player.animations.play('walk');
+      // }
       if (Math.floor(player.body.velocity.x) > 0) {
         player.body.velocity.x -= 1;
         player.animations.play('walk');
@@ -108,10 +111,10 @@ class Game {
       }
       if (Math.floor(player.body.velocity.y) === 0 && Math.floor(player.body.velocity.x) === 0
       && !player.attacking ){
-        player.animations.play('stand')
+        player.animations.play('stand');
       }
       if (player.attacking) {
-        player.animations.play('attack')
+        player.animations.play('attack');
       }
     });
   }
@@ -142,19 +145,23 @@ class Game {
     let player = this.currentSprite;
     if (this.cursors.left.isDown || this.keys.a.isDown)
     {
-      player.body.velocity.x = -50;
+      // player.body.velocity.x = -50;
+      game.physics.arcade.moveToXY(player, player.x-50, player.y, 1, 1);
     }
     else if (this.cursors.right.isDown || this.keys.d.isDown)
     {
-      player.body.velocity.x = 50;
+      // player.body.velocity.x = 50;
+      game.physics.arcade.moveToXY(player, player.x+50, player.y, 1, 1);
     }
     if (this.cursors.up.isDown || this.keys.w.isDown)
     {
-      player.body.velocity.y = -50;
+      // player.body.velocity.y = -50;
+      game.physics.arcade.moveToXY(player, player.x, player.y-50, 1, 1);
     }
     else if (this.cursors.down.isDown || this.keys.s.isDown)
     {
-      player.body.velocity.y = 50;
+      // player.body.velocity.y = 50;
+      game.physics.arcade.moveToXY(player, player.x, player.y+50, 1, 1);
     }
   }
 
@@ -211,13 +218,11 @@ class Game {
   }
 
   correctPos(player){
-    console.log(player);
-    console.log(this.currentUser);
     if (player && this.playerMap && this.playerMap[player.id] && this.currentUser && player.id !== this.currentUser.id) {
       // game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
-      // game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
-      this.playerMap[player.id].position.x = player.x;
-      this.playerMap[player.id].position.y = player.y;
+      game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 1, 1);
+      // this.playerMap[player.id].position.x = player.x;
+      // this.playerMap[player.id].position.y = player.y;
 
       // var tween = game.add.tween(this.playerMap[player.id]).to({x:player.x,y:player.y},1000);
       // tween.start();
