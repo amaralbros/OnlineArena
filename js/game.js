@@ -211,8 +211,14 @@ class Game {
   }
 
   correctPos(player){
-    if (player && this.playerMap && this.playerMap[player.id]) {
-      game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+    console.log(player);
+    console.log(this.currentUser);
+    if (player && this.playerMap && this.playerMap[player.id] && this.currentUser && player.id !== this.currentUser.id) {
+      // game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+      // game.physics.arcade.moveToXY(this.playerMap[player.id], player.x, player.y, 100, 100);
+      this.playerMap[player.id].position.x = player.x;
+      this.playerMap[player.id].position.y = player.y;
+
       // var tween = game.add.tween(this.playerMap[player.id]).to({x:player.x,y:player.y},1000);
       // tween.start();
       this.updateLabelPos(this.playerMap[player.id]);

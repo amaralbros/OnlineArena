@@ -44,8 +44,10 @@ io.on('connection',function(socket){
 
         ///RECEIVES POSITION FROM CLIENT, UPDATES EVERYONE'S GAME TO REFLECT THAT
         socket.on('updatePosFromClient', (pos)=>{
-          socket.player.x = Math.floor(pos.x);
-          socket.player.y = Math.floor(pos.y);
+          // socket.player.x = Math.floor(pos.x);
+          // socket.player.y = Math.floor(pos.y);
+          socket.player.x = pos.x;
+          socket.player.y = pos.y;
           socket.broadcast.emit('updatePosFromServer',socket.player);
         });
 
